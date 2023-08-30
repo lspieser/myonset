@@ -25,13 +25,8 @@ pip install mne
 
 Finally, install Myonset: copy folder ‘myonset_pck’ somewhere on your computer, then in anaconda prompt:
 ```
-pip install ‘PATH_OF_MYONSET_PCK_FOLDER’
+pip install myonset
 ```
-	
-For instance:
-```
-pip install C:\Users\Administrateur\Downloads\myonset_pck
-```	
 
 ### License
 
