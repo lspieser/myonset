@@ -5,7 +5,7 @@ Myonset implements tools for signal preprocessing, automatic onset and offset de
 
 ### Available tutorials
 
-Tutorials ara available as Jupyter Notebook. To run tutorials, download the corresponding notebook and the associated data (if you are not sure which data file you need, downlad all files starting with 'example_...').
+Tutorials ara available as Jupyter Notebooks. To run tutorials, download the corresponding notebook and the associated data (if you are not sure which data file you need, downlad all files starting with 'example_...').
 
 - Tutorial 1 illustrates how to load datafile and preprocess EMG signal using myonset:
     1. Load data file, file formats: text file, bdf (biosemi) file, brain vision (.vhdr) file or edf file. More formats are available using the mne package, you will just have to use the appropriate mne function in cell 3.
