@@ -19,7 +19,8 @@ from .emgtools import (set_log_file, tkeo, filtfilter, hpfilter, lpfilter, notch
                        moving_avg, integrated_profile, 
                        get_onset_ip, 
                        global_var, detector_var, detector_dbl_th, 
-                       signal_windows, get_onsets, get_onsets_dbl_th, 
+                       signal_windows, get_onsets,
+                       get_active_sections,
                        get_signal_portions, get_signal_max, somf, get_onset_somf, show_trial)
 
 from .events import (Events, EpochEvents, load_continuous, load_segmented)

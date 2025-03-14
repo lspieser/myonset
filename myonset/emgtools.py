@@ -95,29 +95,10 @@ def tkeo(array):
         tmp[-1] = tmp[-2]
         return tmp
 
-#def find_times(time_value, time_serie):
-#    """
-#    Returns index such that timeSerie[index] is the closest value
-#    of timeSerie to timeValue.
-#
-#    Parameters
-#    -----------
-#    time_value : float
-#    time_serie : 1D array | list
-#
-#    Returns
-#    --------
-#    index : int
-#
-#    """
-#    import numpy as np
-#    return np.abs(time_serie - time_value).argmin()
-
 def filtfilter(array, N=3, sf=None, cutoff=None, filter_name=None):
     """
     FIXME: sg.filtfilt is better than sg.lfilter especially for low-pass filtering so 
     I think we should use it instead of hfilter and lfilter, agreed ? -> no actually, hp and low are better because no modifciation at the beginning of the burst
-
     """
     from numpy import zeros
     import scipy.signal as sg
@@ -180,7 +161,6 @@ def lpfilter(array, N=3, sf=None, cutoff=150):
     -------
     out : array
         Filtered signal
-
     """
     from numpy import zeros
     import scipy.signal as sg
@@ -241,7 +221,6 @@ def moving_avg(data_trial, window_size):
     Returns
     -------
     1D signal array after moving average.
-
     """
     import numpy as np
     data_trial = np.insert(data_trial,0,np.ones(int(window_size - int(window_size)//2))*data_trial[0])
@@ -267,7 +246,6 @@ def integrated_profile(data_trial, times):
     -------
     d : 1D array
         Integrated profile
-
     """
     import numpy as np
     cs = np.abs(data_trial).cumsum()
@@ -411,7 +389,7 @@ def detector_var(data_trial, times, th=3.5, time_limit=.025,
     time_limit : float
         Lowest time delay (in second) between bursts. Bursts intervals are 
         merged When less time separates interval offset from next interval 
-        onset (default 25ms).
+        onset (default 0.025s).
     min_samples : float
         Minimal number of data points exceeding mbsl + (th * stbsl) in signal 
         intervals. If less points are present, interval is excluded. 
@@ -558,6 +536,24 @@ def detector_dbl_th(data_trial, times, th=3, window_size=.020,
     """
     import numpy as np
     from .latency import find_times
+    
+    if sf is None:
+        raise ValueError('Sampling frequency sf must be provided.')
+
+    # Set parameters default values
+    if th == 'default':
+        th = 3
+    if window_size == 'default':
+        window_size = .020
+    if min_above_threshold == 'default':
+        min_above_threshold = .5
+    if min_samples == 'default':
+        min_samples = 3
+    if mbsl == 'default':
+        mbsl = None
+    if stbsl == 'default':
+        stbsl = None
+        
     t0 = find_times(0, times)
     window_size = int(window_size * sf)
     min_above_threshold = round(min_above_threshold * window_size)
@@ -588,7 +584,6 @@ def detector_dbl_th(data_trial, times, th=3, window_size=.020,
     onsets = onsets[samples > min_samples] ; offsets = offsets[samples > min_samples]
         
     return np.transpose((onsets,offsets))
-
 
 def signal_windows(sections, start, end, warn=False):
     """Define mean temporal windows around the given time sections.
@@ -646,22 +641,21 @@ def signal_windows(sections, start, end, warn=False):
     return windows
 
 def get_onsets(data_trial, times, 
-               use_raw=True, th_raw=3.5, time_limit_raw=.025, min_samples_raw=3, 
-               varying_min_raw=1, mbsl_raw=None, stbsl_raw=None, 
-               use_tkeo=True, th_tkeo=8, time_limit_tkeo=.025, min_samples_tkeo=10, 
-               varying_min_tkeo=0, mbsl_tkeo=None, stbsl_tkeo=None, 
-               sf=None, ip_search=[-.050,.050], moving_avg_window=.015):
+               method = 'single_threshold', 
+               params = {},
+               use_raw=True, use_tkeo=True, 
+               sf=None, ip_search=[-.050,.050], moving_avg_window=.015,
+               ):
     """Return burst(s) onset(s) and offset(s).
     
-    Identify the time windows in data_trial containing EMG bursts, by looking 
-    for signal exceeding the specified variance, using 'detector_var' function. 
-    Then searchs for minimal and maximal values of each window integrated 
-    profile.
+    Identify the time windows in data_trial containing EMG bursts, according to
+    the specified method. Then searchs for minimal and maximal values of each 
+    window integrated profile.
     Finally, onset is defined as the earliest between the time sample of the 
-    minimal value of integrated profile and the EMG burst start defined by 
-    'detector_var' (i.e., signal exceeding the specified variance). Likewise, 
-    offset is defined as the latest between the sample of maximal value of 
-    integrated profile and the end of EMG burst as defined by 'detector_var'. 
+    minimal value of integrated profile and the EMG burst start as defined by 
+    the specified method. Likewise, offset is defined as the latest between the
+    sample of maximal value of integrated profile and the end of EMG burst as 
+    defined by the specified method. 
 
     Parameters
     ----------
@@ -669,71 +663,119 @@ def get_onsets(data_trial, times,
         Input signal.
     times : 1D array
         Time instants.
+    method : str
+        Defines the function used to detect the presence of EMG burst(s). 
+        'single_threshold' uses 'detector_var' function (i.e., detects signal 
+         exceeding the specified variance), 'double_theshold' uses 
+        'detector_dbl_threshold' function (i.e., signal exceeding the specified 
+        variance during a minimal number of time samples) (default is 
+        'single_theshold').
+    params : dict
+        Parameter values used for EMG burst detection using the specified 
+        method. For 'single_threshold' method, possible entries (and default 
+        values) are: 
+        - th_raw : float
+            Threshold to multiply by variance, used in 'detector_var' applied
+            on raw signal (default 3.5).
+        - time_limit_raw : float
+            Lowest time delay (in second) between bursts for raw signal. Bursts
+            intervals are merged When less time separates interval offset from 
+            next interval onset (default is 0.025s).
+        - min_samples_raw : float
+            Minimal number of data points exceeding threshold to define a burst
+            for raw signal. Bursts intervals containing less points exceeding 
+            the specified variance are excluded. This is applied after merging 
+            intervals separated by less than the time limit (default is 3).
+        - varying_min_raw : float
+            If True, the minimal number of data points exceeding threshold 
+            required to define a burst is increased in noisy trials for raw 
+            signal. The noise is estimated by the frequency of "small" bursts 
+            (freq_small), i.e., bursts containing less than twice the defined 
+            minimal number of samples.The minimal number of samples is then 
+            increased up to min_samples + (freq_small * varying_min) (Default 
+            is 1, set to 0 to have no change of min_samples).
+        - mbsl_raw : float | None
+            If None, use the mean baseline value of the raw signal trial 
+            (between first time sample and time sample 0). To use global mbsl, 
+            use 'global_var' function (default is None).
+        - stbsl_raw : float | None
+            If None, use the baseline standard deviation of the raw signal trial
+            (between first time sample and time sample 0). To use global stbsl,
+            apply 'global_var' (default is None).
+        - th_tkeo : float
+            Threshold to multiply by variance, used in 'detector_var' applied
+            on Teager-Kaiser transformation of data_trial signal (default is 8).
+        - time_limit_tkeo : float
+            Lowest time delay (in second) between bursts for Teager-Kaiser
+            transformation of data_trial signal. Bursts intervals are merged 
+            when less time separates interval offset from next interval onset
+            (default is 0.025s). 
+        - min_samples_tkeo : float
+            Minimal number of data points exceeding threshold to define a burst
+            for Teager-Kaiser transformation of data_trial signal. Bursts
+            intervals containing less points exceeding the specified variance 
+            are excluded. This is applied after merging intervals separated by 
+            less than the time limit (default is 10).
+        - varying_min_tkeo : float
+            If True, the minimal number of data points exceeding threshold 
+            required to define a burst is increased in noisy trials for 
+            Teager-Kaiser transformation of data_trial signal. The noise is 
+            estimated by the frequency of "small" bursts (freq_small), i.e., 
+            bursts containing less than twice the defined minimal number of 
+            samples. The minimal number of samples is then increased up to 
+            min_samples + (freq_small * varying_min) (Default is 0, meaning no 
+            change of min_samples).
+        - mbsl_tkeo : float | None
+            If None, use the mean baseline value of the Teager-Kaiser 
+            transformation of data_trial signal (between first time sample and 
+            time sample 0). To use global mbsl, use 'global_var' function on 
+            the Teager-Kaiser signal transformation (default is None).
+        - stbsl_tkeo : float | None
+            If None, use the baseline standard deviation of the Teager-Kaiser
+            transformation of data_trial signal (between first time sample and 
+            time sample 0). To use global stbsl, apply 'global_var' on 
+            Teager-Kaiser signal transformation (default is None).
+        For 'double_threshold method', possible entries (and default values) 
+        are: 
+        - window_size : float
+            Duration of the upfront time window (in second) in which samples 
+            exceeding the threshold are detected (default is 0.020s). 
+        - min_above_threshold : float
+            Minimum proportion of time samples exceeding the theshold in the 
+            time window to detect signal (default 0.50).
+        - th_raw : float
+            Threshold to multiply by stbsl for raw signal (default 3).
+        - mbsl_raw : float | None
+            If None, use the mean baseline value of raw signal (between first 
+            time sample and time sample 0). To use global mbsl, use 'global_var'
+            (default is None).
+        - stbsl_raw : float | None
+            If None, use the baseline standard deviation of raw signal (between
+            first time sample and time sample 0). To use global stbsl, apply
+            'global_var' (default is None).
+        - th_tkeo : float
+            Threshold to multiply by stbsl for Teager-Kaiser transformation of
+            data_trial signal (default 6).
+        - mbsl_tkeo : float | None
+            If None, use the mean baseline value of the Teager-Kaiser 
+            transformation of data_trial signal (between first time sample and 
+            time sample 0). To use global mbsl, use 'global_var' function on 
+            the Teager-Kaiser signal transformation (default is None).
+        - stbsl_tkeo : float | None
+            If None, use the baseline standard deviation of the Teager-Kaiser
+            transformation of data_trial signal (between first time sample and 
+            time sample 0). To use global stbsl, apply 'global_var' on 
+            Teager-Kaiser signal transformation (default is None).
+        - min_samples : float
+            Minimal number of data points exceeding mbsl + (th * stbsl) in 
+            signal intervals. If less points are present, interval is excluded 
+            (default 3).
     use_raw : bool
-        If True, apply 'detector_var' on raw (i.e., data_trial) signal.
-    th_raw : float
-        Threshold to multiply by variance, used in 'detector_var' applied
-        on raw signal (default 3.5).
-    time_limit_raw : float
-        Lowest time delay (in second) between bursts for raw signal. Bursts
-        intervals are merged When less time separates interval offset from next
-        interval onset. (default is 25ms) 
-    min_samples_raw : float
-        Minimal number of data points exceeding threshold to define a burst for
-        raw signal. Bursts intervals containing less points exceeding the
-        specified variance are excluded. This is applied after merging intervals 
-        separated by less than the time limit (default is 3).
-    varying_min_raw : float
-        If True, the minimal number of data points exceeding threshold required 
-        to define a burst is increased in noisy trials for raw signal. The noise
-        is estimated by the frequency of "small" bursts (freq_small), i.e.,
-        bursts containing less than twice the defined minimal number of samples.
-        The minimal number of samples is then increased up to min_samples + 
-        (freq_small * varying_min) (Default is 1, set to 0 to have no change of
-        min_samples).
-    mbsl_raw : float | None
-        If None, use the mean baseline value of the raw signal trial (between
-        first time sample and time sample 0). To use global mbsl, use 
-        'global_var' function (default is None).
-    stbsl_raw : float | None
-        If None, use the baseline standard deviation of the raw signal trial
-        (between first time sample and time sample 0). To use global stbsl,
-        apply 'global_var' (default is None).
+        If True, apply detection method on raw (i.e., data_trial) signal 
+        (default is True).
     use_tkeo : bool
-        If True, apply 'detector_var' on Teager-Kaiser transformation of
-        data_trial signal.
-    th_tkeo : float
-        Threshold to multiply by variance, used in 'detector_var' applied
-        on Teager-Kaiser transformation of data_trial signal (default is 8).
-    time_limit_tkeo : float
-        Lowest time delay (in second) between bursts for Teager-Kaiser
-        transformation of data_trial signal. Bursts intervals are merged When
-        less time separates interval offset from next interval onset
-        (default is 25ms). 
-    min_samples_tkeo : float
-        Minimal number of data points exceeding threshold to define a burst for
-        Teager-Kaiser transformation of data_trial signal. Bursts intervals
-        containing less points exceeding the specified variance are excluded.
-        This is applied after merging intervals separated by less than the time
-        limit (default is 10).
-    varying_min_tkeo : float
-        If True, the minimal number of data points exceeding threshold required 
-        to define a burst is increased in noisy trials for Teager-Kaiser
-        transformation of data_trial signal. The noise is estimated by the
-        frequency of "small" bursts (freq_small), i.e., bursts containing less
-        than twice the defined minimal number of samples. The minimal number of
-        samples is then increased up to min_samples + (freq_small * varying_min)
-        (Default is 0, meaning no change of min_samples).
-    mbsl_tkeo : float | None
-        If None, use the mean baseline value of the Teager-Kaiser transformation
-        of data_trial signal (between first time sample and time sample 0). To
-        use global mbsl, use 'global_var' function on the Teager-Kaiser
-        signal transformation (default is None).
-    stbsl_tkeo : float | None
-        If None, use the baseline standard deviation of the Teager-Kaiser
-        transformation of data_trial signal (between first time sample and time
-        sample 0). To use global stbsl, apply 'global_var' on Teager-Kaiser
-        signal transformation (default is None).
+        If True, apply detection method on Teager-Kaiser transformation of
+        data_trial signal (default is True).
     sf : float
         Sampling frequency.
     ip_search : 1D array
@@ -752,17 +794,12 @@ def get_onsets(data_trial, times,
     """
     import numpy as np
     from .latency import find_times
-    
-    if use_raw: emg_sections = detector_var(data_trial, times, th=th_raw, time_limit=time_limit_raw, min_samples=min_samples_raw, varying_min=varying_min_raw, mbsl=mbsl_raw, stbsl=stbsl_raw, sf=sf)
-    else: emg_sections = np.transpose(([],[]))
-    if use_tkeo: tkeo_sections = detector_var(tkeo(data_trial), times, th=th_tkeo, time_limit=time_limit_tkeo, min_samples=min_samples_tkeo, varying_min=varying_min_tkeo, mbsl=mbsl_tkeo, stbsl=stbsl_tkeo, sf=sf)
-    else: tkeo_sections = np.transpose(([],[]))
-    
-    for tk in tkeo_sections:
-        non_overlap = [b for b in range(len(emg_sections)) if ((emg_sections[b][1] < tk[0]) | (tk[1] < emg_sections[b][0]))]
-        emg_sections = emg_sections[non_overlap]
 
-    emg_sections = np.vstack((emg_sections,tkeo_sections))
+    emg_sections = get_active_sections(data_trial, times,\
+                                       method=method,\
+                                       params=params,\
+                                       use_raw=use_raw, use_tkeo=use_tkeo,\
+                                       sf=sf)
                             
     onsets = [] ; offsets = []
     if emg_sections.shape[0] > 0:
@@ -787,31 +824,22 @@ def get_onsets(data_trial, times,
             onset = np.min((emg_sections[b,0],on_ip + (ip_windows[b,0] - ip_windows[0,0])))
             offset = np.min((emg_sections[b,1],off_ip + (ip_windows[b,0] - ip_windows[0,0])))
             # FIXME for Laure: decide something between those two and adjust the docstring
-#            onset = onIp + (ip_windows[b,0] - ip_windows[0,0])
-#            offset = offIp + (ip_windows[b,0] - ip_windows[0,0])
+            # onset = on_ip + (ip_windows[b,0] - ip_windows[0,0])
+            # offset = off_ip + (ip_windows[b,0] - ip_windows[0,0])
 
             onsets.append(onset)
             offsets.append(offset)
             
     return np.array(onsets,dtype=int), np.array(offsets,dtype=int)
 
-def get_onsets_dbl_th(data_trial, times, window_size=.020, min_above_threshold=.5, 
-                      use_raw=True, th_raw=3, mbsl_raw=None, stbsl_raw=None,
-                      use_tkeo=True, th_tkeo=6, mbsl_tkeo=None, stbsl_tkeo=None, 
-                      min_samples=3, sf=None, ip_search=[-.050,.050], moving_avg_window=.015):
-    """Return burst(s) onset(s) and offset(s).
-    
-    Identify the time windows in data_trial containing EMG bursts, by looking 
-    for signal exceeding the specified variance, using 'detector_dbl_th' 
-    function. 
-    Then searchs for minimal and maximal values of each window integrated 
-    profile.
-    Finally, onset is defined as the earliest between the time sample of the 
-    minimal value of integrated profile and the EMG burst start defined by 
-    'detector_dbl_th' (i.e., signal exceeding the specified variance). 
-    Likewise, offset is defined as the earliest between the sample of maximal 
-    value of integrated profile and the end of EMG burst as defined by 
-    'detector_dbl_th'. 
+def get_active_sections(data_trial, times,\
+                        method='single_threshold',\
+                        params={},\
+                        use_raw=True, use_tkeo=True,\
+                        sf=None):
+    """
+    Identify the time windows in data_trial containing EMG bursts, according to
+    the specified method. 
 
     Parameters
     ----------
@@ -819,104 +847,253 @@ def get_onsets_dbl_th(data_trial, times, window_size=.020, min_above_threshold=.
         Input signal.
     times : 1D array
         Time instants.
-    window_size : float
-        Duration of the upfront time window (in second) in which samples 
-        exceeding the threshold are detected. 
-    min_above_threshold : float
-        Minimum proportion of time samples exceeding the theshold in the 
-        time window to detect signal (default 50 %).
+    method : str
+        Defines the function used to detect the presence of EMG burst(s). 
+        'single_threshold' uses 'detector_var' function (i.e., detects signal 
+         exceeding the specified variance), 'double_theshold' uses 
+        'detector_dbl_threshold' function (i.e., signal exceeding the specified 
+        variance during a minimal number of time samples) (default is 
+        'single_theshold').
+    params : dict
+        Parameter values used for EMG burst detection using the specified 
+        method. For 'single_threshold' method, possible entries (and default 
+        values) are: 
+        - th_raw : float
+            Threshold to multiply by variance, used in 'detector_var' applied
+            on raw signal (default 3.5).
+        - time_limit_raw : float
+            Lowest time delay (in second) between bursts for raw signal. Bursts
+            intervals are merged When less time separates interval offset from 
+            next interval onset (default is 0.025s).
+        - min_samples_raw : float
+            Minimal number of data points exceeding threshold to define a burst
+            for raw signal. Bursts intervals containing less points exceeding 
+            the specified variance are excluded. This is applied after merging 
+            intervals separated by less than the time limit (default is 3).
+        - varying_min_raw : float
+            If True, the minimal number of data points exceeding threshold 
+            required to define a burst is increased in noisy trials for raw 
+            signal. The noise is estimated by the frequency of "small" bursts 
+            (freq_small), i.e., bursts containing less than twice the defined 
+            minimal number of samples.The minimal number of samples is then 
+            increased up to min_samples + (freq_small * varying_min) (Default 
+            is 1, set to 0 to have no change of min_samples).
+        - mbsl_raw : float | None
+            If None, use the mean baseline value of the raw signal trial 
+            (between first time sample and time sample 0). To use global mbsl, 
+            use 'global_var' function (default is None).
+        - stbsl_raw : float | None
+            If None, use the baseline standard deviation of the raw signal trial
+            (between first time sample and time sample 0). To use global stbsl,
+            apply 'global_var' (default is None).
+        - th_tkeo : float
+            Threshold to multiply by variance, used in 'detector_var' applied
+            on Teager-Kaiser transformation of data_trial signal (default is 8).
+        - time_limit_tkeo : float
+            Lowest time delay (in second) between bursts for Teager-Kaiser
+            transformation of data_trial signal. Bursts intervals are merged 
+            when less time separates interval offset from next interval onset
+            (default is 0.025s). 
+        - min_samples_tkeo : float
+            Minimal number of data points exceeding threshold to define a burst
+            for Teager-Kaiser transformation of data_trial signal. Bursts
+            intervals containing less points exceeding the specified variance 
+            are excluded. This is applied after merging intervals separated by 
+            less than the time limit (default is 10).
+        - varying_min_tkeo : float
+            If True, the minimal number of data points exceeding threshold 
+            required to define a burst is increased in noisy trials for 
+            Teager-Kaiser transformation of data_trial signal. The noise is 
+            estimated by the frequency of "small" bursts (freq_small), i.e., 
+            bursts containing less than twice the defined minimal number of 
+            samples. The minimal number of samples is then increased up to 
+            min_samples + (freq_small * varying_min) (Default is 0, meaning no 
+            change of min_samples).
+        - mbsl_tkeo : float | None
+            If None, use the mean baseline value of the Teager-Kaiser 
+            transformation of data_trial signal (between first time sample and 
+            time sample 0). To use global mbsl, use 'global_var' function on 
+            the Teager-Kaiser signal transformation (default is None).
+        - stbsl_tkeo : float | None
+            If None, use the baseline standard deviation of the Teager-Kaiser
+            transformation of data_trial signal (between first time sample and 
+            time sample 0). To use global stbsl, apply 'global_var' on 
+            Teager-Kaiser signal transformation (default is None).
+        For 'double_threshold method', possible entries (and default values) 
+        are: 
+        - window_size : float
+            Duration of the upfront time window (in second) in which samples 
+            exceeding the threshold are detected (default is 0.020s). 
+        - min_above_threshold : float
+            Minimum proportion of time samples exceeding the theshold in the 
+            time window to detect signal (default 0.50).
+        - th_raw : float
+            Threshold to multiply by stbsl for raw signal (default 3).
+        - mbsl_raw : float | None
+            If None, use the mean baseline value of raw signal (between first 
+            time sample and time sample 0). To use global mbsl, use 'global_var'
+            (default is None).
+        - stbsl_raw : float | None
+            If None, use the baseline standard deviation of raw signal (between
+            first time sample and time sample 0). To use global stbsl, apply
+            'global_var' (default is None).
+        - th_tkeo : float
+            Threshold to multiply by stbsl for Teager-Kaiser transformation of
+            data_trial signal (default 6).
+        - mbsl_tkeo : float | None
+            If None, use the mean baseline value of the Teager-Kaiser 
+            transformation of data_trial signal (between first time sample and 
+            time sample 0). To use global mbsl, use 'global_var' function on 
+            the Teager-Kaiser signal transformation (default is None).
+        - stbsl_tkeo : float | None
+            If None, use the baseline standard deviation of the Teager-Kaiser
+            transformation of data_trial signal (between first time sample and 
+            time sample 0). To use global stbsl, apply 'global_var' on 
+            Teager-Kaiser signal transformation (default is None).
+        - min_samples : float
+            Minimal number of data points exceeding mbsl + (th * stbsl) in 
+            signal intervals. If less points are present, interval is excluded 
+            (default 3).
     use_raw : bool
-        If True, 'detector_dbl_th' is applied on raw (i.e., data_trial) signal.
-    th_raw : float
-        Threshold to multiply by stbsl for raw signal (default 3).
-    mbsl_raw : float | None
-        If None, use the mean baseline value of raw signal (between first time
-        sample and time sample 0). To use global mbsl, use 'global_var'
-        (default is None).
-    stbsl_raw : float | None
-        If None, use the baseline standard deviation of raw signal (between
-        first time sample and time sample 0). To use global stbsl, apply
-        'global_var' (default is None).
+        If True, apply detection method on raw (i.e., data_trial) signal 
+        (default is True).
     use_tkeo : bool
-        If True, 'detector_dbl_th' is applied on Teager-Kaiser transformation 
-        of data_trial signal.
-    th_tkeo : float
-        Threshold to multiply by stbsl for Teager-Kaiser transformation of
-        data_trial signal (default 6).
-    mbsl_tkeo : float | None
-        If None, use the mean baseline value of the Teager-Kaiser transformation
-        of data_trial signal (between first time sample and time sample 0). To
-        use global mbsl, use 'global_var' function on the Teager-Kaiser
-        signal transformation (default is None).
-    stbsl_tkeo : float | None
-        If None, use the baseline standard deviation of the Teager-Kaiser
-        transformation of data_trial signal (between first time sample and time
-        sample 0). To use global stbsl, apply 'global_var' on Teager-Kaiser
-        signal transformation (default is None).
-    min_samples : float
-        Minimal number of data points exceeding mbsl + (th * stbsl) in signal 
-        intervals. If less points are present, interval is excluded (default 3).
+        If True, apply detection method on Teager-Kaiser transformation of
+        data_trial signal (default is True).
     sf : float
         Sampling frequency.
-    ip_search : 1D array
-        Time limits (in second) around EMG burst intervals (as defined by 
-        'detector_dbl_th') to search for minimal and maximal integrated profile 
-        values (Default [-.050 0.050]).
-    moving_avg_window : float
-        Time window size (in second) of moving average applied to smooth 
-        integarted profile before to define minimal and maximal values. To 
-        not smooth at all, set moving_avg_window to 1/sf (Default is 0.015).
-       
-    Returns
-    -------
-    onsets,offsets : lists 
-        Indices of data_trial corresponding to EMG onsets and offsets
     """
     import numpy as np
-    from .latency import find_times
+    if method == 'single_threshold':
+        if use_raw: 
+            # get parameters values for detector_var function
+            if 'th_raw' in params.keys(): 
+                th_raw = params['th_raw']
+            else:
+                th_raw = 3.5
+            if 'time_limit_raw' in params.keys():
+                time_limit_raw = params['time_limit_raw']
+            else:
+                time_limit_raw = 0.025
+            if 'min_samples_raw' in params.keys():
+                min_samples_raw = params['min_samples_raw']
+            else:
+                min_samples_raw = 3
+            if 'varying_min_raw' in params.keys():
+                varying_min_raw = params['varying_min_raw']
+            else:
+                varying_min_raw = 1
+            if 'mbsl_raw' in params.keys():
+                mbsl_raw = params['mbsl_raw']
+            else:
+                mbsl_raw = None
+            if 'stbsl_raw' in params.keys():
+                stbsl_raw = params['stbsl_raw']
+            else:
+                stbsl_raw = None
+            
+            # apply detector_var (single threshold detector)
+            active_sections_raw = detector_var(data_trial, times, 
+                                               th=th_raw, time_limit=time_limit_raw, min_samples=min_samples_raw, 
+                                               varying_min=varying_min_raw, mbsl=mbsl_raw, stbsl=stbsl_raw, sf=sf)
+        else: 
+            active_sections_raw = np.transpose(([],[]))
+        
+        if use_tkeo: 
+            # get parameters values for detector_var function
+            if 'th_tkeo' in params.keys():
+                th_tkeo = params['th_tkeo']
+            else:
+                th_tkeo = 8
+            if 'time_limit_tkeo' in params.keys():
+                time_limit_tkeo = params['time_limit_tkeo']
+            else:
+                time_limit_tkeo = 0.025
+            if 'min_samples_tkeo' in params.keys():
+                min_samples_tkeo = params['min_samples_tkeo']
+            else:
+                min_samples_tkeo = 10
+            if 'varying_min_tkeo' in params.keys():
+                varying_min_tkeo = params['varying_min_tkeo']
+            else:
+                varying_min_tkeo = 0
+            if 'mbsl_tkeo' in params.keys():
+                mbsl_tkeo = params['mbsl_tkeo']
+            else:
+                mbsl_tkeo = None
+            if 'stbsl_tkeo' in params.keys():
+                stbsl_tkeo = params['stbsl_tkeo']
+            else:
+                stbsl_tkeo = None
+                
+            # apply detector_var (single threshold detector)
+            active_sections_tkeo = detector_var(tkeo(data_trial), times, th=th_tkeo, time_limit=time_limit_tkeo, min_samples=min_samples_tkeo,
+                                                varying_min=varying_min_tkeo, mbsl=mbsl_tkeo, stbsl=stbsl_tkeo, sf=sf)
+        else: 
+            active_sections_tkeo = np.transpose(([],[]))
+        
+    elif method == 'double_threshold':
+
+        # get parameters values for detector_dbl_th function
+        if 'window_size' in params.keys():
+            window_size = params['window_size']
+        else:
+            window_size = 0.020
+        if 'min_above_threshold' in params.keys():
+            min_above_threshold = params['min_above_threshold']
+        else:
+            min_above_threshold = 0.5
+        if 'min_samples' in params.keys():
+            min_samples = params['min_samples']
+        else:
+            min_samples = 3 
+        if use_raw: 
+            if 'th_raw' in params.keys(): 
+                th_raw = params['th_raw']
+            else:
+                th_raw = 3
+            if 'mbsl_raw' in params.keys():
+                mbsl_raw = params['mbsl_raw']
+            else:
+                mbsl_raw = None
+            if 'stbsl_raw' in params.keys():
+                stbsl_raw = params['stbsl_raw']
+            else:
+                stbsl_raw = None
+                
+            # apply detector_dbl_th (double threshold detector)
+            active_sections_raw = detector_dbl_th(data_trial, times, th=th_raw, window_size=window_size, 
+                                                  min_above_threshold=min_above_threshold, min_samples=min_samples, mbsl=mbsl_raw, stbsl=stbsl_raw, sf=sf)
+        else: 
+            active_sections_raw = np.transpose(([],[]))
+
+        if use_tkeo: 
+            if 'th_tkeo' in params.keys(): 
+                th_tkeo = params['th_tkeo']
+            else:
+                th_tkeo = 6
+            if 'mbsl_tkeo' in params.keys():
+                mbsl_tkeo = params['mbsl_tkeo']
+            else:
+                mbsl_tkeo = None
+            if 'stbsl_tkeo' in params.keys():
+                stbsl_tkeo = params['stbsl_tkeo']
+            else:
+                stbsl_tkeo = None
+                
+            # apply detector_dbl_th (double threshold detector)
+            active_sections_tkeo = detector_dbl_th(tkeo(data_trial), times, th=th_tkeo, window_size=window_size, 
+                                                   min_above_threshold=min_above_threshold, min_samples=min_samples, mbsl=mbsl_tkeo, stbsl=stbsl_tkeo, sf=sf)
+        else: 
+            active_sections_tkeo = np.transpose(([],[]))
+        
+    for tk in active_sections_tkeo:
+        non_overlap = [b for b in range(len(active_sections_raw)) if ((active_sections_raw[b][1] < tk[0]) | (tk[1] < active_sections_raw[b][0]))]
+        active_sections_raw = active_sections_raw[non_overlap]
+
+    active_sections = np.vstack((active_sections_raw,active_sections_tkeo))
     
-    moving_avg_window = int(moving_avg_window * sf)
-
-    if use_raw: emg_sections = detector_dbl_th(data_trial, times, th=th_raw, window_size=window_size, min_above_threshold=min_above_threshold, min_samples=min_samples, mbsl=mbsl_raw, stbsl=stbsl_raw, sf=sf)
-    else: emg_sections = np.transpose(([],[]))
-    if use_tkeo: tkeo_sections = detector_dbl_th(tkeo(data_trial), times, th=th_tkeo, window_size=window_size, min_above_threshold=min_above_threshold, min_samples=min_samples, mbsl=mbsl_tkeo, stbsl=stbsl_tkeo, sf=sf)
-    else: tkeo_sections = np.transpose(([],[]))
-    
-    for tk in tkeo_sections:
-        non_overlap = [b for b in range(len(emg_sections)) if ((emg_sections[b][1] < tk[0]) | (tk[1] < emg_sections[b][0]))]
-        emg_sections = emg_sections[non_overlap]
-
-    emg_sections = np.vstack((emg_sections,tkeo_sections))
-                            
-    onsets = [] ; offsets = []
-    if emg_sections.shape[0] > 0:
-
-        emg_sections = emg_sections[np.argsort(emg_sections[:,0])]
-
-        t0 = find_times(times,0)
-        ip_windows = np.array(signal_windows(emg_sections, t0, len(data_trial)),dtype=int)
-        bsl_idx = np.hstack((np.arange(0,ip_windows[0,0]),np.arange(ip_windows[-1,1],len(data_trial))))
-            
-        for b in range(emg_sections.shape[0]):
-            
-            section_idx = np.hstack((bsl_idx,np.arange(ip_windows[b,0],ip_windows[b,1])))
-            section_idx.sort()
-            
-            sample_search_start = int(emg_sections[b,0] + np.floor(ip_search[0]*sf) - (ip_windows[b,0] - ip_windows[0,0]))
-            sample_search_end = int(emg_sections[b,1] + np.ceil(ip_search[1]*sf) - (ip_windows[b,0] - ip_windows[0,0]))
-            sample_search = np.arange(np.max((sample_search_start, ip_windows[b,0] - (ip_windows[b,0] - ip_windows[0,0]))),np.min((sample_search_end, ip_windows[b,1] - (ip_windows[b,0] - ip_windows[0,0]))))
-            
-            on_ip,off_ip = get_onset_ip(data_trial[section_idx], times[:len(section_idx)], samples=sample_search, moving_avg_size=moving_avg_window)
-
-            onset = np.min((emg_sections[b,0],on_ip + (ip_windows[b,0] - ip_windows[0,0])))
-            offset = np.min((emg_sections[b,1],off_ip + (ip_windows[b,0] - ip_windows[0,0])))
-#            onset = on_ip + (ip_windows[b,0] - ip_windows[0,0])
-#            offset = off_ip + (ip_windows[b,0] - ip_windows[0,0])
-
-            onsets.append(onset)
-            offsets.append(offset)
-            
-    return np.array(onsets,dtype=int), np.array(offsets,dtype=int)
+    return np.array(active_sections,dtype=int)
 
 def get_signal_portions(array, start_samples, stop_samples):
     """Get signals between each start_sample and stop_sample.
@@ -1026,41 +1203,30 @@ def get_onset_somf(data, somf, W=900, L=.5):
 
 
 def show_trial(data_trial, times, 
-               use_raw=True, th_raw=3.5, time_limit_raw=.025, min_samples_raw=3, 
-               varying_min_raw=1, mbsl_raw=None, stbsl_raw=None, 
-               use_tkeo=True, th_tkeo=8, time_limit_tkeo=.025, min_samples_tkeo=10, 
-               varying_min_tkeo=0, mbsl_tkeo=None, stbsl_tkeo=None, 
+               method='single_threshold',
+               params={},\
+               use_raw=True, use_tkeo=True, 
                sf=None, ip_search=[-.050,.050], 
                moving_avg_window=.015):
     """Show data trial burst detection and onset/offset detection.
     See 'get_onsets' function for complete description of the parameters.
     """
-    import numpy as np
+    # import numpy as np
 #    import pylab as plt
     import matplotlib.pyplot as plt
     
     onsets,offsets = get_onsets(data_trial, times, 
-                                use_raw=use_raw, th_raw=th_raw, time_limit_raw=time_limit_raw, min_samples_raw=min_samples_raw,
-                                varying_min_raw=varying_min_raw, mbsl_raw=mbsl_raw, stbsl_raw=stbsl_raw, 
-                                use_tkeo=use_tkeo, th_tkeo=th_tkeo, time_limit_tkeo=time_limit_tkeo, min_samples_tkeo=min_samples_tkeo,
-                                varying_min_tkeo=varying_min_tkeo, mbsl_tkeo=mbsl_tkeo, stbsl_tkeo=stbsl_tkeo, 
+                                method=method,
+                                params=params,
+                                use_raw=use_raw, use_tkeo=use_tkeo,  
                                 sf=sf, ip_search=ip_search,
                                 moving_avg_window=moving_avg_window)
 
-    if use_raw:
-        emg_sections = detector_var(data_trial, times, th=th_raw, time_limit=time_limit_raw, min_samples=min_samples_raw, varying_min=varying_min_raw, mbsl=mbsl_raw, stbsl=stbsl_raw, sf=sf)
-    else:
-        emg_sections = np.transpose(np.array(([],[]),dtype='int'))
-    if use_tkeo:
-        tkeo_sections = detector_var(tkeo(data_trial), times, th=th_tkeo, time_limit=time_limit_tkeo, min_samples=min_samples_tkeo, varying_min=varying_min_tkeo, mbsl=mbsl_tkeo, stbsl=stbsl_tkeo, sf=sf)
-    else:
-        tkeo_sections = np.transpose(np.array(([],[]),dtype='int'))	
-	
-    for tk in tkeo_sections:
-        non_overlap = [b for b in range(len(emg_sections)) if ((emg_sections[b][1] < tk[0]) | (tk[1] < emg_sections[b][0]))]
-        emg_sections = emg_sections[non_overlap]
-
-    emg_sections = np.vstack((emg_sections,tkeo_sections))
+    emg_sections = get_active_sections(data_trial, times,
+                                       method=method,
+                                       params=params, 
+                                       use_raw=use_raw, use_tkeo=use_tkeo,
+                                       sf=sf)
 
     plt.figure()
     plt.plot(times, data_trial, 'k', linewidth = .75)
