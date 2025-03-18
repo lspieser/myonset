@@ -22,7 +22,7 @@ with open("README.md", "r") as fh:
     
 setuptools.setup(
         name = "myonset",
-        version = "0.1",
+        version = "1.0",
         author = "Laure Spieser and Boris Burle",
         author_email = "laure.spieser@univ-amu.fr",
         description = "Myonset is a package for detecting EMG burst onset.",
