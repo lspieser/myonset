@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "myonset"
+version = "1.0"
+authors = [{name="Laure Spieser",email="laure.spieser@univ-amu.fr"},{name="Boris Burle"}]
+description = "Myonset is a package for detecting EMG burst onset."
+license = "GPL-3.0-only"
+license-files = ["COPYING"]
+readme = "README.md"
+requires-python = ">=3.6"
+keywords = ["EMG","electromyography"]
+classifiers = [
+		"Programming Language :: Python :: 3",
+		"Topic :: Scientific/Engineering :: Medical Science Apps.",
+		"Operating System :: OS Independent",
+		]
+dependencies = ["pyqtgraph"]
