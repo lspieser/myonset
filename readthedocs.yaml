@@ -9,8 +9,13 @@ build:
   os: ubuntu-24.04
   tools:
     python: "3.13"
-  commands:
-    - pip install myonset
+  jobs:
+    install:
+      - pip install myonset
+    build:
+      html:
+        - mkdir -p $READTHEDOCS_OUTPUT/html/
+        - myonset --settings doc/source/conf.py --output $READTHEDOCS_OUTPUT/html/
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
