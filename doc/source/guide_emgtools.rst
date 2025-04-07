@@ -26,7 +26,7 @@ on a raw EMG signal (shown on :ref:`Figure 1 <figure1>`, top left). As can be se
 
 .. _figure1:
 
-.. figure:: ./figures/figure1.svg
+.. figure:: ./figures/figure1.png
 
     Raw EMG signal (top left) on which three methods of automatic detection are applied: Threshold method (top right), applied on rectified EMG signal ; 
     Teager-Kaiser operator transformation (bottom left) ; and integrated profile method (bottom right).
