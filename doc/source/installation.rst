@@ -17,13 +17,10 @@ Most users will also need mne-python, on which we mainly rely to open and save f
     
 	pip install mne
 
-Finally, install DEBut: copy folder ‘myonset_pck’ somewhere on your computer, then in anaconda prompt::
+Finally, install myonset, still in anaconda prompt::
     
-	pip install <PATH_OF_MYONSET_PCK_FOLDER>
+	pip install myonset
 	
-For instance::
-    
-	pip install C:\Users\Administrateur\Downloads\myonset_pck
 	
 
 
