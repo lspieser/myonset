@@ -1,10 +1,10 @@
 Automatic detection of EMG busts
 ================================
 
-Myonset integrates several tools for the processing of electromyographic data signals.
+MYOnset integrates several tools for the processing of electromyographic data signals.
 Those tools should be used in combination of our visualization tool, allowing easy visualization and manual correction of EMG onset and offset markers (see :ref:`viz module guide <guide_vizEMG>`). 
 
-Myonset contains signal processing functions, methods for automatic detection, and one algorithm combining different automatic detection methods, intended to result in 
+MYOnset contains signal processing functions, methods for automatic detection, and one algorithm combining different automatic detection methods, intended to result in 
 optimized automatic detection. The algorithm consists in a two-steps method: first step is to individualize EMG burst(s) present in the signal,
 while second step is to determine the latency at which each EMG burst starts (onset) and ends (offset). The first step is based on a threshold method, with two methods actually available 
 (a custom single threshold method, and a double threshold method), while the second step is always performed using the
@@ -17,7 +17,7 @@ while second step is to determine the latency at which each EMG burst starts (on
 Numerous methods have been proposed to determine EMG bursts onset and offset, but none has been shown to be as good as human visual detection.
 Accordingly, our intention here is not to provide a perfect automatized detection, but rather to improve automatic detection as much as possible,
 and make the unavoidable manual correction step as easy as possible (see :ref:`viz module guide <guide_vizEMG>` for manual correction).
-DEBut automatic detection is based on different methods previously proposed for EMG signal processing. :ref:`Figure 1 <figure1>` illustrates the application of those different methods
+MYOnset automatic detection is based on different methods previously proposed for EMG signal processing. :ref:`Figure 1 <figure1>` illustrates the application of those different methods
 on a raw EMG signal (shown on :ref:`Figure 1 <figure1>`, top left). As can be seen, each approach presents different benefits and drawbacks:
 
 * The frequently-used variance threshold methods, illustrated on top right panel of :ref:`Figure 1 <figure1>`, detect EMG activity when signal amplitude exceeds some threshold value computed from the EMG signal mean and variance (see for instance Hodges and Bui, 1996 [HoBu96]_). This method accurately detects periods of active EMG, but tends to over-estimate EMG onset and under-estimate EMG offset.
@@ -37,7 +37,7 @@ For optimal automatic detection, we therefore recommend a two-steps approach con
 
 2. Determine the onset and offset of each burst using the integrated profile method. 
 
-Myonset functions `get_onsets` and `get_onsets_dbl_th` implement such two-steps methods. The two functions differ in the threshold method used for the first step of burst individualisation, 
+MYOnset functions `get_onsets` and `get_onsets_dbl_th` implement such two-steps methods. The two functions differ in the threshold method used for the first step of burst individualisation, 
 the former using a single threshold while the latter uses a double threshold method.
 Below, we present the Teager-Kaiser EMG transformation, then describe in details the two threshold detection methods to use on both raw and Teager-Kaiser EMG. 
 Finally, we present the final step of onset and offset detection based on the integrated profile method. Reader in a hurry may skip the detailed description and go straight
@@ -62,7 +62,7 @@ shows how active EMG signal is amplified over non-active periods. However, even 
 activities potentially informative (e.g., partial errors). This is visible for instance on :ref:`Figure 1 <figure1>` where small bursts occurring around 0.8-1s are no longer 
 visible on Teager-Kaiser signal. In standard conditions, we therefore recommend using detection methods on both raw and Teager-Kaiser signals.
 
-Below is some example code to apply Teager-Kaiser transformation in Myonset, with data a 1D array containing continuous EMG signal::
+Below is some example code to apply Teager-Kaiser transformation in MYOnset, with data a 1D array containing continuous EMG signal::
 
     import myonset as myo
     tk_emg = myo.tkeo(data)
@@ -164,7 +164,7 @@ The major drawback of this method is that only one onset and one offset can be d
 
 For optimal automatic detection of EMG activity onset and offset, we recommend to first individualize EMG burst periods using a threshold method, and second determine 
 each EMG onset and offset with integrated profile method. 
-:ref:`Figure 5 <figure5>` shows the whole pipeline for such procedure, which has been implemented in Myonset functions ``get_onsets`` and ``get_onsets_dbl_th`` 
+:ref:`Figure 5 <figure5>` shows the whole pipeline for such procedure, which has been implemented in MYOnset functions ``get_onsets`` and ``get_onsets_dbl_th`` 
 (the difference being the threshold method used for first step). In more details, each function consists in:
 
 1. Detect and individualize EMG burst(s) using ``detector_var`` (``get_onsets``) or ``detector_dbl_th`` (``get_onsets_dbl_th``). See :ref:`Threshold detection methods <threshold_detection_methods>` above for more details.
