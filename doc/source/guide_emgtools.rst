@@ -202,7 +202,7 @@ Below is some example code to call the ``get_onsets`` function, and a :ref:`tabl
                                     method='single_threshold',
                                     use_raw=True, use_tkeo=True,
                                     params={'th_raw':3.5, 'varying_min_raw':1,\
-									        'th_tkeo':8, 'varying_min_tkeo':0})
+                                            'th_tkeo':8, 'varying_min_tkeo':0})
 
 .. _table1:
 
@@ -212,6 +212,10 @@ Below is some example code to call the ``get_onsets`` function, and a :ref:`tabl
 	| Name            | Description                          | Recommended     | Default    | General effect /   |
 	|                 |                                      |   value         | value      |     Comment        |
 	+=================+======================================+=================+============+====================+
+	| method          | Detection method to use, can be set  |'single_thre     |'single_thre| Best choice may    |
+	|                 | to 'single_threshold' or             |shold'           |shold'      | depend on your data| 
+	|                 | 'double_threshold'                   |                 |            | of course          | 
+	+-----------------+--------------------------------------+-----------------+------------+--------------------+
 	| use_raw         | If True, apply ``detector_var`` on   | True            | True       | Sensitive to small |
 	|                 | raw EMG                              |                 |            | EMG bursts         | 
 	+-----------------+--------------------------------------+-----------------+------------+--------------------+
