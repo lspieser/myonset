@@ -23,7 +23,7 @@ event triggers are recorded on the *Status* channel. ::
     trigger_events = mne.find_events(raw, stim_channel='Status')
 
 
-In myonset, the specific class ``Events`` is implemented to store and manipulate event triggers. Documentation on ``Events`` structure is available in the :ref:`Events class <guide_events>` section. ::
+In myonset, the specific class ``Events`` is implemented to store and manipulate event triggers. Documentation on ``Events`` structure is available in the :ref:`Events class <guide_events>` section, and some example code can be found in `tutorial2_play_with_events.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial2_play_with_events.ipynb>`_. ::
 
     import myonset as myo
     sf = raw.info['sfreq']
@@ -43,16 +43,16 @@ applied to EMG channels, EMG signal is high-pass filtered and extracted in 2D nu
 	raw = myo.use_mne.apply_filter(raw, ch_names=['EMG_1','EMG_2'], low_cutoff=10)
 	data = myo.use_mne.get_data_array(raw, ch_names=['EMG_1','EMG_2'])
 
-Full example code to perform steps 1-3 is provided in tutorial notebooks `tutorial1a_load_and_preproc_text.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`_ ,
-`tutorial1b_load_and_preproc_bdf.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`_ , `tutorial1c_load_and_preproc_brainvision.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`_
-and `tutorial1d_load_and_preproc_edf.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`_. Once done, you can either save the ``data`` signal array and 
+Full example code to perform steps 1-3 is provided in tutorial notebooks `tutorial1a_load_and_preproc_text.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial1a_load_and_preproc_text.ipynb>`_ ,
+`tutorial1b_load_and_preproc_bdf.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial1b_load_and_preproc_bdf.ipynb>`_, `tutorial1c_load_and_preproc_brainvision.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial1c_load_and_preproc_brainvision.ipynb>`_
+and `tutorial1d_load_and_preproc_edf.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial1d_load_and_preproc_edf.ipynb>`_. Once done, you can either save the ``data`` signal array and 
 ``events`` structure for later use (as in the tutorials), or directly continue with the following steps: 
 
 
 4. Automatic detection of EMG onsets and offsets: 
 -------------------------------------------------
 First, continuous EMG signal is segmented in trials, or **epochs**, defined between tmin and tmax latencies around reference events (i.e., time 0 events). 
-Typically, stimulus marker events are used as time 0 events. ::
+Typically, stimulus marker events are used as time 0 events. For instance below, stimulus marker codes are 11, 12, 21 and 22.::
 
     code_t0 = [11,12,21,22]
     epochs_events = events.segment(code_t0=code_t0, tmin=-0.5, tmax=1)
@@ -62,7 +62,7 @@ Typically, stimulus marker events are used as time 0 events. ::
 
 Then, automatic detection of onsets and offsets is performed for each epoch using the function ``get_onsets``. The function is explained in detail in section :ref:`Utilization of get_onsets function <get_onsets>`, we here describe it very briefly:
 
-1. In first step, time windows containing EMG signal exceeding the specified threshold are detected. This is done on raw signal, if parameter ``use_raw`` is set to True and on Teager-Kaiser transformed signal if ``use_tkeo`` is set to True. The threshold values are defined, respectively, by parameters ``th_raw`` and ``th_tkeo``. ``th_raw`` value is usually between 3 and 7, ``th_tkeo`` between 8 and 12, default values are set to 3.5 and 8, respectively.
+1. In first step, time windows containing active EMG signal are detected. This is done on raw signal, if parameter ``use_raw`` is set to True and on Teager-Kaiser transformed signal if ``use_tkeo`` is set to True. By default, a single threshold method is used, threshold values are defined by parameters ``th_raw`` and ``th_tkeo``, respectively for raw and Teager-Kaiser signals. ``th_raw`` value is usually between 3 and 7 (default 3.5), ``th_tkeo`` between 8 and 12 (default 8).
 
 2. In second step, onset and offset are determined in each window containing active EMG signal (using the integrated profile method).
 
@@ -70,13 +70,12 @@ For instance, to get EMG onset(s) and offset(s) on epoch 5, first channel::
 
     current_epoch = 5
     current_channel = 0
-    onsets,offsets = myo.get_onsets(epochs_data[current_epoch,current_channel,:], epoch_time, sf=epochs_events.sf,\
-                                    th_raw=5, use_raw=True, mbsl_raw=None, stbsl_raw=None,\
-                                    th_tkeo=10, use_tkeo=True, mbsl_tkeo=None, stbsl_tkeo=None)
+	onsets,offsets = myo.get_onsets(epochs_data[current_epoch,current_channel,:], epoch_time,\
+									sf=epochs_events.sf)
 
 
 Onsets and offsets are given in time samples relative to the beginning of ``current_epoch``, such that ``epoch_time[onsets]`` returns burst(s) onset(s) time latencies relative to time 0 event. 
-Detailed description of ``get_onsets`` parameters is also provided in :ref:`this table<table1>`, and full example code is provided in tutorial notebook `automatic_detection`.  
+Detailed description of ``get_onsets`` parameters is also provided in :ref:`this table<table1>`, and full example code is provided in tutorial notebook `tutorial3_automatic_detection.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial3_automatic_detection.ipynb>`_.  
 
 Onsets and offsets can then be stored in events object and included in ``epochs_events``, for instance using codes 4 and 5 (note that you should use codes not already in use in your dataset)::
 
@@ -90,7 +89,7 @@ Onsets and offsets can then be stored in events object and included in ``epochs_
 	
 In the next step, we recommend to transform *epoched* events back into *continuous* events, i.e., with latency information relative to the beginning 
 of the EMG file instead of the beginning of each epoch.
-In Myonset, this can be easily done using the method ``as_continuous()``
+In myonset, this can be easily done using the method ``as_continuous()``
 (storing the events as continuous is usually a good idea, as it maintains the time correspondence between the EMG signal and the events)::
 
     events_with_detection = epochs_events.as_continuous()[0]
@@ -106,7 +105,7 @@ All duplicated events will be deleted automatically if parameter ``drop_duplic``
 
 Finally, results of automatic detection must be inspected. Indeed, it is almost impossible to obtain perfectly accurate automatic detection given the signal to noise ratio of EMG. 
 Although time-consuming, we hence strongly recommend to proceed to the visualization and correction step described below.
-**Note that automatic detection from Myonset is not intended to be used without inspection.**
+**Note that automatic detection from myonset is not intended to be used without inspection.**
 
 5. Visualization and correction of automatic onset and offset detection markers
 -------------------------------------------------------------------------------
@@ -116,7 +115,10 @@ This step of visual inspection is required for two types of corrections. First, 
 or whether any background EMG activity has been erroneously marked as EMG of interest (i.e., to correct automatic detection *misses* and *false alarms*). 
 Second, adjust onset and offset time positions latencies when automatic detection markers are shifted relative to true, visually-detected, onset and offset.
 
-Myonset contains a customed visualization window, allowing to both visualize **and correct** onset and offset event markers. 
+Myonset contains a customed visualization window, allowing to both visualize **and correct** onset and offset event markers. The example code below is also 
+available in tutorial `tutorial4_viz_and_correct.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial4_viz_and_correct.ipynb>`_.
+
+
 To use the ``viz`` window, one first needs to create a viz application and fill in with 
 continuous data and events, and the list of time 0 events::
 
@@ -148,6 +150,5 @@ to avoid erasing file `viz_events.csv` next time ``viz`` window is used. ::
 
     corrected_events = viz.get_events()
     corrected_events.to_csv('corrected_events_participantXX.csv')
-
 
 
