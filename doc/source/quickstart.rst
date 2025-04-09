@@ -43,9 +43,9 @@ applied to EMG channels, EMG signal is high-pass filtered and extracted in 2D nu
 	raw = myo.use_mne.apply_filter(raw, ch_names=['EMG_1','EMG_2'], low_cutoff=10)
 	data = myo.use_mne.get_data_array(raw, ch_names=['EMG_1','EMG_2'])
 
-Full example code to perform steps 1-3 is provided in tutorial notebooks `tutorial1a_load_and_preproc_text.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>` ,
-`tutorial1b_load_and_preproc_bdf.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>` , `tutorial1c_load_and_preproc_brainvision.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>` 
-and `tutorial1d_load_and_preproc_edf.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`. Once done, you can either save the ``data`` signal array and 
+Full example code to perform steps 1-3 is provided in tutorial notebooks `tutorial1a_load_and_preproc_text.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`_ ,
+`tutorial1b_load_and_preproc_bdf.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`_ , `tutorial1c_load_and_preproc_brainvision.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`_
+and `tutorial1d_load_and_preproc_edf.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`_. Once done, you can either save the ``data`` signal array and 
 ``events`` structure for later use (as in the tutorials), or directly continue with the following steps: 
 
 
