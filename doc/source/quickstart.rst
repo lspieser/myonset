@@ -70,8 +70,8 @@ For instance, to get EMG onset(s) and offset(s) on epoch 5, first channel::
 
     current_epoch = 5
     current_channel = 0
-	onsets,offsets = myo.get_onsets(epochs_data[current_epoch,current_channel,:], epoch_time,\
-									sf=epochs_events.sf)
+    onsets,offsets = myo.get_onsets(epochs_data[current_epoch,current_channel,:], epoch_time,\
+	                                sf=epochs_events.sf)
 
 
 Onsets and offsets are given in time samples relative to the beginning of ``current_epoch``, such that ``epoch_time[onsets]`` returns burst(s) onset(s) time latencies relative to time 0 event. 
