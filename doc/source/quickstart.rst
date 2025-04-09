@@ -4,7 +4,7 @@ Myonset QuickStart
 
 Myonset is a package to process and detect signal burst(s) onset and offset, developed for electromyographic (EMG) signal.
 Myonset implements tools for signal preprocessing, **automatic onset and offset detection**, as well as **visualization and correction** of onset and offset latencies. 
-Standard processing pipeline in Myonset is briefly described below.
+Standard processing pipeline in myonset is briefly described below.
 
 1. Import EMG data
 ------------------
@@ -23,7 +23,7 @@ event triggers are recorded on the *Status* channel. ::
     trigger_events = mne.find_events(raw, stim_channel='Status')
 
 
-In Myonset, the specific class ``Events`` is implemented to store and manipulate event triggers. Documentation on ``Events`` structure is available in the :ref:`Events class <guide_events>` section. ::
+In myonset, the specific class ``Events`` is implemented to store and manipulate event triggers. Documentation on ``Events`` structure is available in the :ref:`Events class <guide_events>` section. ::
 
     import myonset as myo
     sf = raw.info['sfreq']
@@ -36,14 +36,16 @@ In Myonset, the specific class ``Events`` is implemented to store and manipulate
 3. Pre-process EMG signals
 --------------------------
 
-Pre-processing functions are available in modules `use_mne` or `use_txt` (depending on how data were loaded in step 1). For example below, bipolar montage is 
+Pre-processing functions are available directly or in modules `use_mne` or `use_txt` (depending on how data were loaded in step 1). For example below, bipolar montage is 
 applied to EMG channels, EMG signal is high-pass filtered and extracted in 2D numpy array::
 
 	myo.use_mne.bipolar_ref(raw, ['EXG1','EXG3'], ['EXG2','EXG4'], new_ch=['EMG_1','EMG_2'], copy=False)
 	raw = myo.use_mne.apply_filter(raw, ch_names=['EMG_1','EMG_2'], low_cutoff=10)
 	data = myo.use_mne.get_data_array(raw, ch_names=['EMG_1','EMG_2'])
 
-Full example code to perform steps 1-3 is provided in tutorial notebooks `load_and_prepoc_edf` , `load_and_prepoc_brainvision` , `load_and_prepoc_bdf` and `load_and_prepoc_text`. Once done, you can either save the ``data`` signal array and 
+Full example code to perform steps 1-3 is provided in tutorial notebooks `tutorial1a_load_and_preproc_text.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>` ,
+`tutorial1b_load_and_preproc_bdf.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>` , `tutorial1c_load_and_preproc_brainvision.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>` 
+and `tutorial1d_load_and_preproc_edf.ipynb <https://github.com/lspieser/myonset/tree/main/tutorials>`. Once done, you can either save the ``data`` signal array and 
 ``events`` structure for later use (as in the tutorials), or directly continue with the following steps: 
 
 
