@@ -38,7 +38,7 @@ For optimal automatic detection, we therefore recommend a two-steps approach con
 2. Determine the onset and offset of each burst using the integrated profile method. 
 
 MYOnset function `get_onsets` implements such two-steps methods. The function can be used with either single or double threshold methods for the first step of burst individualisation. 
-By default, single threshold is used.
+The method to use is specified by ``method`` parameter (by default, single threshold is used).
 Below, we present the Teager-Kaiser EMG transformation, then describe in details the single and double threshold detection methods to use on both raw and Teager-Kaiser EMG. 
 Finally, we present the final step of onset and offset detection based on the integrated profile method. Reader in a hurry may skip the detailed description and go straight
 to the :ref:`recommended methods combination <recommended_methods_combination>` section.
@@ -152,7 +152,7 @@ The major drawback of this method is that only one onset and one offset can be d
 
 .. figure:: ./figures/figure4.svg
 
-    Left panel: raw EMG signal (background grey signal), and corresponding cumulative sum of rectified signal (dark grey), as well as its uniform equivalent 
+    Left panel: raw rectified EMG signal (background grey signal), and corresponding cumulative sum (dark grey), as well as its uniform equivalent 
     (i.e., monotically increasing function, grey straight line) ; Right panel : integrated profile (dark grey) , resulting from the difference between cumulative sum and 
     monotically increasing function. The minimum and maximum values of integrated profile (vertical dotted lines) define raw EMG onset and offset. 
 
@@ -164,10 +164,10 @@ The major drawback of this method is that only one onset and one offset can be d
 
 For optimal automatic detection of EMG activity onset and offset, we recommend to first individualize EMG burst periods using a threshold method, and second determine 
 each EMG onset and offset with integrated profile method. 
-:ref:`Figure 5 <figure5>` shows the whole pipeline for such procedure, which has been implemented in MYOnset functions ``get_onsets`` and ``get_onsets_dbl_th`` 
-(the difference being the threshold method used for first step). In more details, each function consists in:
+:ref:`Figure 5 <figure5>` shows the whole pipeline for such procedure, which has been implemented in MYOnset function ``get_onsets``.
+ In more details, the function consists in:
 
-1. Detect and individualize EMG burst(s) using ``detector_var`` (``get_onsets``) or ``detector_dbl_th`` (``get_onsets_dbl_th``). See :ref:`Threshold detection methods <threshold_detection_methods>` above for more details.
+1. Detect and individualize EMG burst(s) using either ``detector_var`` or ``detector_dbl_th``, depending on which . See :ref:`Threshold detection methods <threshold_detection_methods>` above for more details.
 2. Based on 1., split continuous EMG into active and baseline periods (``signal_windows`` function). The initial baseline period is defined from first sample to mean latency between time 0 and first EMG burst, the final baseline period is defined from mean latency between end of last EMG burst and last sample. In between, bounds of active periods are located halfway between consecutive bursts. If EMG activity was detected before time 0 in step 1., first bound is placed halfway between first sample and start of first burst. 
 3. For each active EMG period, determine EMG onset and offset using integrated profile. Because this method necessitates both baseline and active EMG signal, detection is performed on a rebuilt signal made of the active period surrounded by the initial and final baseline periods. For best detection even on very small EMG bursts, integrated profile is smoothed by moving average (default size window 0.015s), and minimum and maximum values are detected on a restrained time window around the active EMG period defined in 1. (by default up to -.050s to +.050s around active EMG).  
 4. Burst(s) onset and offset are returned in a numpy array, with onsets samples in first column and offset samples in second column. 
