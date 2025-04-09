@@ -4,10 +4,10 @@ Automatic detection of EMG busts
 Myonset integrates several tools for the processing of electromyographic data signals.
 Those tools should be used in combination of our visualization tool, allowing easy visualization and manual correction of EMG onset and offset markers (see :ref:`viz module guide <guide_vizEMG>`). 
 
-Myonset contains signal processing functions, methods for automatic detection, and two algorithms combining different automatic detection methods, intended to result in 
-optimized automatic detection. Both algorithms consist in a two-steps method: first step is to individualize EMG burst(s) present in the signal,
-while second step is to determine the latency at which each EMG burst starts (onset) and ends (offset). The first step is based on a threshold method, different between
-the two algorithms (custom single threshold in `get_onsets` function, and double threshold in `get_onsets_dbl_th`), while the second step is always performed using the
+Myonset contains signal processing functions, methods for automatic detection, and one algorithm combining different automatic detection methods, intended to result in 
+optimized automatic detection. The algorithm consists in a two-steps method: first step is to individualize EMG burst(s) present in the signal,
+while second step is to determine the latency at which each EMG burst starts (onset) and ends (offset). The first step is based on a threshold method, with two methods actually available 
+(a custom single threshold method, and a double threshold method), while the second step is always performed using the
 ‘integrated profile’ method. All those methods and their combination are described in details below.
 
 

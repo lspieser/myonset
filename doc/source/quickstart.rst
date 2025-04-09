@@ -1,14 +1,14 @@
-Myonset QuickStart
+MYOnset QuickStart
 ==================
 
 
-Myonset is a package to process and detect signal burst(s) onset and offset, developed for electromyographic (EMG) signal.
-Myonset implements tools for signal preprocessing, **automatic onset and offset detection**, as well as **visualization and correction** of onset and offset latencies. 
-Standard processing pipeline in myonset is briefly described below.
+MYOnset is a package to process and detect signal burst(s) onset and offset, developed for electromyographic (EMG) signal.
+MYOnset implements tools for signal preprocessing, **automatic onset and offset detection**, as well as **visualization and correction** of onset and offset latencies. 
+Standard processing pipeline in MYOnset is briefly described below.
 
 1. Import EMG data
 ------------------
-Myonset does not provide loading tools, we recommend loading EMG files using `MNE-python <https://mne.tools/stable/index.html>`_ (`see available formats in MNE-python <https://mne.tools/stable/python_reference.html#reading-raw-data>`_). 
+MYOnset does not provide loading tools, we recommend loading EMG files using `MNE-python <https://mne.tools/stable/index.html>`_ (`see available formats in MNE-python <https://mne.tools/stable/python_reference.html#reading-raw-data>`_). 
 Also, text files can be read directly (module `use_txt`, function ``load_txt_file``). For example below, biosemi .bdf file is loaded through mne::
 
     import mne
@@ -23,7 +23,7 @@ event triggers are recorded on the *Status* channel. ::
     trigger_events = mne.find_events(raw, stim_channel='Status')
 
 
-In myonset, the specific class ``Events`` is implemented to store and manipulate event triggers. Documentation on ``Events`` structure is available in the :ref:`Events class <guide_events>` section, and some example code can be found in `tutorial2_play_with_events.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial2_play_with_events.ipynb>`_. ::
+In MYOnset, the specific class ``Events`` is implemented to store and manipulate event triggers. Documentation on ``Events`` structure is available in the :ref:`Events class <guide_events>` section, and some example code can be found in `tutorial2_play_with_events.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial2_play_with_events.ipynb>`_. ::
 
     import myonset as myo
     sf = raw.info['sfreq']
@@ -89,7 +89,7 @@ Onsets and offsets can then be stored in events object and included in ``epochs_
 	
 In the next step, we recommend to transform *epoched* events back into *continuous* events, i.e., with latency information relative to the beginning 
 of the EMG file instead of the beginning of each epoch.
-In myonset, this can be easily done using the method ``as_continuous()``
+In MYOnset, this can be easily done using the method ``as_continuous()``
 (storing the events as continuous is usually a good idea, as it maintains the time correspondence between the EMG signal and the events)::
 
     events_with_detection = epochs_events.as_continuous()[0]
@@ -105,7 +105,7 @@ All duplicated events will be deleted automatically if parameter ``drop_duplic``
 
 Finally, results of automatic detection must be inspected. Indeed, it is almost impossible to obtain perfectly accurate automatic detection given the signal to noise ratio of EMG. 
 Although time-consuming, we hence strongly recommend to proceed to the visualization and correction step described below.
-**Note that automatic detection from myonset is not intended to be used without inspection.**
+**Note that automatic detection from MYOnset is not intended to be used without inspection.**
 
 5. Visualization and correction of automatic onset and offset detection markers
 -------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ This step of visual inspection is required for two types of corrections. First, 
 or whether any background EMG activity has been erroneously marked as EMG of interest (i.e., to correct automatic detection *misses* and *false alarms*). 
 Second, adjust onset and offset time positions latencies when automatic detection markers are shifted relative to true, visually-detected, onset and offset.
 
-Myonset contains a customed visualization window, allowing to both visualize **and correct** onset and offset event markers. The example code below is also 
+MYOnset contains a customed visualization window, allowing to both visualize **and correct** onset and offset event markers. The example code below is also 
 available in tutorial `tutorial4_viz_and_correct.ipynb <https://github.com/lspieser/myonset/blob/main/tutorials/tutorial4_viz_and_correct.ipynb>`_.
 
 
