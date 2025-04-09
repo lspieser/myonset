@@ -37,9 +37,9 @@ For optimal automatic detection, we therefore recommend a two-steps approach con
 
 2. Determine the onset and offset of each burst using the integrated profile method. 
 
-MYOnset functions `get_onsets` and `get_onsets_dbl_th` implement such two-steps methods. The two functions differ in the threshold method used for the first step of burst individualisation, 
-the former using a single threshold while the latter uses a double threshold method.
-Below, we present the Teager-Kaiser EMG transformation, then describe in details the two threshold detection methods to use on both raw and Teager-Kaiser EMG. 
+MYOnset function `get_onsets` implements such two-steps methods. The function can be used with either single or double threshold methods for the first step of burst individualisation. 
+By default, single threshold is used.
+Below, we present the Teager-Kaiser EMG transformation, then describe in details the single and double threshold detection methods to use on both raw and Teager-Kaiser EMG. 
 Finally, we present the final step of onset and offset detection based on the integrated profile method. Reader in a hurry may skip the detailed description and go straight
 to the :ref:`recommended methods combination <recommended_methods_combination>` section.
 
@@ -108,7 +108,7 @@ The effect of using ``varying_min`` is illustrated in :ref:`Figure 2 <figure2>` 
 	
 .. _figure2:
 
-.. figure:: ./figures/figure2.svg
+.. figure:: ./figures/figure2.jpg
 
     Function ``detector_var``, effects of varying threshold value (``th``, upper row), the minimum time period separating consecutive bursts (``time_limit``, middle row), 
     and allowing variation of the minimal number of data samples above threshold to define an active EMG period (``varying_min``, lower row). 
