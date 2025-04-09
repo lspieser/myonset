@@ -74,14 +74,14 @@ Below is some example code to apply Teager-Kaiser transformation in MYOnset, wit
 
 As said above, those methods detect the presence of EMG activity as soon as signal amplitude exceeds a threshold value determined by the mean and variance of baseline EMG signal 
 (see for instance Hodges and Bui, 1996 [HoBu96]_). In the case of double threshold method, EMG activity is detected if a minimum number of data points during a given time 
-window exceeds the threshold value (see Bonato et al., 1998 [BoDK98]_). We first describe the function ``detector_var``, based on a customized single threshold method, 
-and then ``detector_dbl_th`` that uses double threshold detection.
+window exceeds the threshold value (see Bonato et al., 1998 [BoDK98]_). We first describe the function used in the case of single threshold detection (function ``detector_var``),  
+and then the one used for double threshold detection method (function ``detector_dbl_th``).
 
 .. _function_detector_var:
 
-2.2.1. Function detector_var
+2.2.1. Single threshold detection: ``detector_var`` function
 
-This function detects active EMG time periods on continuous EMG signal, it can be used on raw or Teager-Kaiser transformed EMG. 
+The ``detector_var`` is based on a customized single threshold detection method. It detects active EMG time periods on continuous EMG signal, it can be used on raw or Teager-Kaiser transformed EMG. 
 For example, with data_trial a 1D array containing single trial EMG signal and times the corresponding time latencies::
 
     active_periods = myo.detector_var(data_trial, times, th=3.5, sf=sf)
