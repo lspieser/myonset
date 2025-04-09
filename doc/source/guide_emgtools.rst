@@ -21,12 +21,12 @@ MYOnset automatic detection is based on different methods previously proposed fo
 on a raw EMG signal (shown on :ref:`Figure 1 <figure1>`, top left). As can be seen, each approach presents different benefits and drawbacks:
 
 * The frequently-used variance threshold methods, illustrated on top right panel of :ref:`Figure 1 <figure1>`, detect EMG activity when signal amplitude exceeds some threshold value computed from the EMG signal mean and variance (see for instance Hodges and Bui, 1996 [HoBu96]_). This method accurately detects periods of active EMG, but tends to over-estimate EMG onset and under-estimate EMG offset.
-* The ‘integrated profile’ method (Santello and McDonagh, 1998 [SaMc98]_) provides an accurate detection of burst onset and offset in most cases, but can be used only when one EMG burst has occurred (not less, not more). This method is shown in :ref:`Figure 1 <figure1>`, bottom right panel.  
+* The ‘integrated profile’ method (Santello and McDonagh, 1998 [SaMc98]_) provides an accurate detection of burst onset and offset in most cases, but can be used only when **one** EMG burst has occurred (not less, not more). This method is shown in :ref:`Figure 1 <figure1>`, bottom right panel.  
 * The Teager-Kaiser energy operator (TKEO) transformation of EMG signal (Li et al., 2007 [LiZh07]_), shown on bottom left panel of :ref:`Figure 1 <figure1>`, is particularly efficient to amplify EMG burst signal and improve signal-to-noise ratio in the presence of continuous EMG activity, but often erases small EMG bursts (e.g., partial errors). This method does not itself determine activity onset and offset, but can be applied before threshold or integrated profile methods (Solnik et al., 2010 [SRSD10]_; Tenan et al., 2017 [TeTH17]_).
 
 .. _figure1:
 
-.. figure:: ./figures/figure1.png
+.. figure:: ./figures/figure1.jpg
 
     Raw EMG signal (top left) on which three methods of automatic detection are applied: Threshold method (top right), applied on rectified EMG signal ; 
     Teager-Kaiser operator transformation (bottom left) ; and integrated profile method (bottom right).
