@@ -159,8 +159,11 @@ The major drawback of this method is that only one onset and one offset can be d
 
 .. _recommended_methods_combination:
 
-3. Recommended methods combination
-----------------------------------
+3. Recommended methods combination : the ``get_onsets`` function
+----------------------------------------------------------------
+
+3.1. Pipeline of ``get_onsets`` function
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For optimal automatic detection of EMG activity onset and offset, we recommend to first individualize EMG burst periods using a threshold method, and second determine 
 each EMG onset and offset with integrated profile method. 
@@ -176,27 +179,30 @@ In more details, the function consists in:
 
 .. figure:: ./figures/figure5.svg
 
-    Pipeline of ``get_onsets`` and ``get_onsets_dbl_th`` functions: 1. detection of active EMG periods based on ``detector_var`` or ``detector_dbl_th``, 2. split whole signal into 
+    Pipeline of ``get_onsets`` functions: 1. detection of active EMG periods based on ``detector_var`` (single theshold method) or ``detector_dbl_th`` (double theshold method), 2. split whole signal into 
     active and baseline EMG time windows using ``signal_windows`` function, 3. burst onset and offset in each active EMG period are detected using integrated profile method, 
     and 4. onset and offset are determined as the earliest between integrated profile onset/offset and detector variance method. 
 
 
 .. _get_onsets:
 
-3.1. Utilization of ``get_onsets`` function
+3.2. Utilization of ``get_onsets`` function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For the ``get_onsets`` function, the first step of detection of active EMG windows is based on ``detector_var`` function, which uses a custom single threshold method described 
+For the ``get_onsets`` function, the first step of detection of active EMG windows is based on single or double threshold method, depending on the value of ``method`` parameter.
+When ``method = 'single_threshold'``, detection is made using ``detector_var`` function, which is based on a custom single threshold method described 
 :ref:`above<function_detector_var>`. 
-This first step can be applied either on raw EMG, on Teager-Kaiser EMG, or on both (active EMG is detected if either raw or Teager-Kaiser signal exceeds the threshold). 
-Parameters of ``detector_var`` must be set separately for raw EMG and Teager-Kaiser EMG. 
+When ``method = 'double_threshold'``, detection is made using ``detector_dbl_th`` function, which uses a double threshold method described 
+:ref:`above<function_detector_dbl_th>`.
+In all cases, this first detection step can be applied either on raw EMG, on Teager-Kaiser EMG, or on both (active EMG is detected if either raw or Teager-Kaiser signal exceeds the threshold). 
+Detection parameters must be set separately for raw EMG and Teager-Kaiser EMG. 
 Below is some example code to call the ``get_onsets`` function, and a :ref:`table<table1>` presenting all possible optional parameters::
 
     onsets,offsets = myo.get_onsets(data_trial, times, sf=sf, 
-                                    use_raw=True, th_raw=3.5, varying_min_raw=1,
-                                    use_tkeo=True, th_tkeo=8, varying_min_tkeo=0)
-
-
+                                    method='single_threshold',
+                                    use_raw=True, use_tkeo=True,
+                                    params={'th_raw':3.5, 'varying_min_raw':1,\
+									        'th_tkeo':8, 'varying_min_tkeo':0})
 
 .. _table1:
 
