@@ -37,7 +37,7 @@ For optimal automatic detection, we therefore recommend a two-steps approach con
 
 2. Determine the onset and offset of each burst using the integrated profile method. 
 
-MYOnset function `get_onsets` implements such two-steps methods. The function can be used with either single or double threshold methods for the first step of burst individualisation. 
+MYOnset function ``get_onsets`` implements such two-steps methods. The function can be used with either single or double threshold methods for the first step of burst individualisation. 
 The method to use is specified by ``method`` parameter (by default, single threshold is used).
 Below, we present the Teager-Kaiser EMG transformation, then describe in details the single and double threshold detection methods to use on both raw and Teager-Kaiser EMG. 
 Finally, we present the final step of onset and offset detection based on the integrated profile method. Reader in a hurry may skip the detailed description and go straight
