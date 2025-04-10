@@ -230,7 +230,7 @@ Below is some example code to call the ``get_onsets`` function, and a :ref:`tabl
 	|min_samples_raw  | Required minimum number of samples   |    1 to 5        |   3        |Increase to reduce  |
 	|                 | above threshold                      |                  |            |detection of small  | 
 	|                 |                                      |                  |            |EMG bursts          | 
-	+-----------------+--------------------------------------+-----------------+------------+--------------------+
+	+-----------------+--------------------------------------+------------------+------------+--------------------+
 	|varying_min_raw  | The amount by which min_samples is   | 0 (no variation) |   1        |Increase to reduce  |
 	|                 | increased if small EMG bursts are    | to 3             |            |detection of small  | 
 	|                 | present (active raw EMG periods with |                  |            |EMG burst in noisy  | 
