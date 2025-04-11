@@ -4,7 +4,7 @@ Onsets and offsets visualization and manual correction
 ======================================================
 
 After performing automatic detection, we strongly recommend to proceed to visualization and manual correction of EMG bursts onsets and offsets.
-Myonset implements a PyQt application named ``Viz``, especially designed to facilitate this manual step. 
+MYOnset implements a PyQt application named ``Viz``, especially designed to facilitate this manual step. 
 It provides an adapted window view for EMG signals and the associated markers, including experimental triggers and eventual markers resulting from automatic detection 
 of EMG onset and offset. Importantly, user can interact with onset and offset markers to:
 
