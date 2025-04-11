@@ -63,7 +63,7 @@ stored respectively in Events.lat, Events.code and Events.chan::
         chan: [-1 -1  0 -1 -1  1 -1]
 
 Each event information is stored in ``Events.lat.time``, ``Events.lat.sample``, ``Events.code``, ``Events.chan``, at the same index across arrays: 
-the code of the event occurring at time ``Events.lat.time[n]`` is given by ``Events.code[n]``. In the above example, ``exp_evts`` contain 5 marker events: 
+the code of the event occurring at time ``Events.lat.time[n]`` is given by ``Events.code[n]``. In the above example, ``exp_evts`` contain 7 marker events: 
 
 * events of code ``2``, then ``4``, occurring respectively at 1 and 1.5 seconds (samples 1024 and 1536), for instance the occurrence of a fixation point followed by a stimulus. Note that they are associated with channel ``-1``, which is the channel number used in MYOnset for event markers which are not associated to a particular channel
 * event ``onset``, at time 1.623s (sample 1662), specifying in this example the onset of EMG burst on channel ``0``
@@ -74,7 +74,7 @@ the code of the event occurring at time ``Events.lat.time[n]`` is given by ``Eve
 
 The full list of methods available in ``Events`` is presented in :ref:`the table below<table_events_methods>`. We will here present briefly how to access and segment events.
 
-To access one or several events, use the method get_events with event indices as arguments:
+To access one or several events, use the method ``get_events`` with event indices as arguments:
 
 * one event::
 
@@ -153,12 +153,12 @@ For instance here, to segment on stimulus events::
 
 The ``EpochEvents`` object is used to store segmented events or *epoch* events, i.e., events divided in fixed length segments, usually around reference event code(s), 
 defined by ``code_t0`` parameter. In most cases, the ``EpochEvents`` is obtained after the segmentation of continuous events stored in an ``Events`` object. 
-For instance, in the above example, events are segmented from -0.5 to 1s around each event ``'4'``. Two events ``‘4’`` are present in exp_evts, 
+For instance, in the above example, events are segmented from -0.5 to 1s around each event ``'4'``. Two events ``'4'`` are present in ``exp_evts``, 
 resulting in an EpochEvents containing 2 trials (or 2 segments). 
 
 EpochEvents contain:
 
-* ``list_evts_trials``: list of ``Events`` objects storing the marker events of consecutive trials. Each element of ``list_evts_trials`` is an independent Events object. Note that time latencies are now given in reference to the trial’s *code_t0* event, while sample latencies are given in reference to trial’s first sample::
+* ``list_evts_trials``: list of ``Events`` objects storing the marker events of consecutive trials. Each element of ``list_evts_trials`` is an independent ``Events`` object. Note that time latencies are now given in reference to the trial’s *code_t0* event, while sample latencies are given in reference to trial’s first sample::
 
     epochs_evts.list_evts_trials[0]
      > class Events, 4 events, sf = 1024.0 
@@ -191,9 +191,9 @@ We here present only the method ``as_continuous``, allowing to return to continu
      > Checking for duplicates in events...
      > 0 event(s) removed.
 
-The method concatenates all trials’ ``Events`` (i.e., all elements of list_evts_trials) and recompute continuous events latencies based on ``EpochEvents.tmin`` latencies. 
+The method concatenates all trials’ ``Events`` (i.e., all elements of ``list_evts_trials``) and recompute continuous events latencies based on ``EpochEvents.tmin`` latencies. 
 A new ``Events`` object is returned, containing the continuous events (``continuous_evts``) as well as a numpy array containing the trial index of each event of the continuous events. 
-In the example below, the ``continuous_evts`` is equal to ``exp_evts`` above, and trials array indicate that events 0 to 3 in ``continuous_evts`` belonged to trial 0, 
+In the example below, the ``continuous_evts`` is equal to ``exp_evts`` above, and ``trials`` array indicate that events 0 to 3 in ``continuous_evts`` belonged to trial 0, 
 and events 4 to 6 belonged to trial 1. ::
 
     continuous_evts
@@ -224,7 +224,7 @@ In most cases, this has no consequence for the epoch events. When switching back
 
 By default, ``as_continuous`` keeps only the first occurrence of any duplicated event (i.e., marker events with same latency, code and channel), 
 and the user is informed of the total number of duplicated events that have been deleted. 
-Note that checking for duplicates across all events can take time, to deactivate this precaution and keep all events, set drop_duplic to False::
+Note that checking for duplicates across all events can take time, to deactivate this precaution and keep all events, set ``drop_duplic`` to False::
 
     continuous_evts, trials = epochs_evts.as_continuous(drop_duplic=False)
     continuous_evts
