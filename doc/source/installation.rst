@@ -34,8 +34,6 @@ For a rapid check of your installation, run the code below::
 
 
 	import numpy as np
-	import os
-	os.chdir("C:\\Users\\lspieser\\Nextcloud\Documents\myonset_public\myonset")
 	import myonset as myo
 	 
 	# Generates random signal (i.e., EMG background)
