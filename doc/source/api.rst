@@ -5,6 +5,8 @@ API reference
 Signal preprocessing 
 --------------------
 
+.. autofunction:: use_mne.apply_filter
+
 .. automodule:: use_mne
     :members: apply_filter, bipolar_ref, drop_channels, get_data_array, select_channels
 
