@@ -5,8 +5,8 @@ Events class and functions
 
 What we call *event* here is a time marker, also called *trigger*, specifying the exact time positions of specific events like stimulus or response in (continuous) data recording such as EMG. 
 Note that after performing the automatic detection of EMG onset(s) and offset(s), each burst onset and offset is stored in event markers, and saved in event files with the original event markers.
-We will here describe the available classes and functions implemented in Myonset to make it easier to store and handle events. 
-Two container objects are available for events in Myonset: 
+We will here describe the available classes and functions implemented in MYOnset to make it easier to store and handle events. 
+Two container objects are available for events in MYOnset: 
 
 * Events, intended to contain events of continuous data signal 
 * EpochEvents containing events from data signal segmented in trials (or *epochs*)
@@ -65,7 +65,7 @@ stored respectively in Events.lat, Events.code and Events.chan::
 Each event information is stored in ``Events.lat.time``, ``Events.lat.sample``, ``Events.code``, ``Events.chan``, at the same index across arrays: 
 the code of the event occurring at time ``Events.lat.time[n]`` is given by ``Events.code[n]``. In the above example, ``exp_evts`` contain 5 marker events: 
 
-* events of code ``2``, then ``4``, occurring respectively at 1 and 1.5 seconds (samples 1024 and 1536), for instance the occurrence of a fixation point followed by a stimulus. Note that they are associated with channel ``-1``, which is the channel number used in Myonset for event markers which are not associated to a particular channel
+* events of code ``2``, then ``4``, occurring respectively at 1 and 1.5 seconds (samples 1024 and 1536), for instance the occurrence of a fixation point followed by a stimulus. Note that they are associated with channel ``-1``, which is the channel number used in MYOnset for event markers which are not associated to a particular channel
 * event ``onset``, at time 1.623s (sample 1662), specifying in this example the onset of EMG burst on channel ``0``
 * event of code ``16``, for instance a left-hand response, occurring at 1.678s
 * event ``4`` again, i.e., a new stimulus appearing at 3.5s
