@@ -212,12 +212,29 @@ Below is some example code to call the ``get_onsets`` function, and a :ref:`tabl
 	| Name            | Description                          | Recommended      | Default    | General effect /   |
 	|                 |                                      |   value          | value      |     Comment        |
 	+=================+======================================+==================+============+====================+
-	| method          | Detection method to use, can be set  |'single_threshold'|'single_thre| Best choice may    |
-	|                 | to 'single_threshold' or             |                  |shold'      | depend on your data| 
+	| method          | Detection method to use, can be      |'single_threshold'|'single_thre| Best choice may    |
+	|                 | 'single_threshold' or                |                  |shold'      | depend on your data| 
 	|                 | 'double_threshold'                   |                  |            | of course          | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
-	| use_raw         | If True, apply ``detector_var`` on   | True             | True       | Sensitive to small |
-	|                 | raw EMG                              |                  |            | EMG bursts         | 
+	| params          | Dictionnary with parameters specific |  See details below            | Sensitive to small |
+	|                 | to the detection method              |                               | EMG bursts         | 
+	+-----------------+--------------------------------------+------------------+------------+--------------------+
+	| use_raw         | If True, apply detection on raw EMG  | True             | True       | Sensitive to small |
+	|                 |                                      |                  |            | EMG bursts         | 
+	+-----------------+--------------------------------------+------------------+------------+--------------------+
+	| use_tkeo        | If True, apply detection on Teager-  | True             | True       | Less sensitive to  |
+	|                 | Kaiser EMG                           |                  |            | noisy EMG          | 
+	+-----------------+--------------------------------------+------------------+------------+--------------------+
+	|sf               | EMG signal sampling frequency        |                  |   None     |If not provided, an |
+	|                 |                                      |                  |            |error occurs        | 
+	+-----------------+--------------------------------------+------------------+------------+--------------------+
+	|ip_search        | Maximum time window (in s) to search | [-.025,.025] to  |[-.050,.050]|Affect mainly       |
+	|                 | onset and offset around active EMG   | [-.075,.075]     |            |small EMG bursts    | 
+	|                 | period                               |                  |            |                    | 
+	+-----------------+--------------------------------------+------------------+------------+--------------------+
+	|moving_avg_window| Window width (in s) for moving       | 1/sf (no         |   .015     |Again, affect mainly|
+	|                 | average of the integrated profile    | smoothing) to    |            |small EMG bursts    | 
+	|                 |                                      | .050             |            |                    | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
 	| th_raw          | Treshold value for raw EMG           |   3 to 7         |   3.5      | Increase to make   |
 	|                 |                                      |                  |            | detection less     | 
@@ -244,9 +261,6 @@ Below is some example code to call the ``get_onsets`` function, and a :ref:`tabl
 	|stbsl_raw        | Variance of rectified raw EMG signal |Global or trial's | Trial's    |Use trial's variance|
 	|                 |                                      |baseline variance | baseline   |adapts threshold to | 
 	|                 |                                      |                  | variance   |current background  | 
-	+-----------------+--------------------------------------+------------------+------------+--------------------+
-	| use_tkeo        | If True, apply ``detector_var`` on   | True             | True       | Less sensitive to  |
-	|                 | Teager-Kaiser EMG                    |                  |            | noisy EMG          | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
 	| th_tkeo         | Treshold value for Teager-Kaiser EMG |   8 to 12        |   8        | Increase to make   |
 	|                 |                                      |                  |            | detection less     | 
