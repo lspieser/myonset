@@ -15,7 +15,7 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 
-# -- Project information -----------------------------------------------------
+# -- Project information ----------------------------------------------------,'sphinx_copybutton'-
 
 project = 'Myonset'
 copyright = '2020, Laure Spieser and Boris Burle'
