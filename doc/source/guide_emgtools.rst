@@ -205,10 +205,7 @@ Below is some example code to call the ``get_onsets`` function, and a tables pre
                                             use_raw=True, use_tkeo=True)
 
 |
-|
 
-Optional ``get_onsets`` parameters   
-""""""""""""""""""""""""""""""""""
 .. _table1:
 
 .. table:: Table ``get_onsets`` optional parameters
@@ -221,7 +218,7 @@ Optional ``get_onsets`` parameters
 	|                 | 'single_threshold' or                |                  |shold'      | depend on your data| 
 	|                 | 'double_threshold'                   |                  |            | of course          | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
-	| params          | Dictionnary with parameters specific |         See details for each method below          |
+	| params          | Dictionnary with parameters specific |            See details for each method below       |
 	|                 | to the detection method              | (single threshold :ref:`table<table2>` and double  | 
 	|                 | to the detection method              | threshold :ref:`table<table3>`)                    | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
@@ -243,11 +240,7 @@ Optional ``get_onsets`` parameters
 	|                 |                                      | .050             |            |                    | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
 
-
 |
-|
-
-Parameters for single threshold detection
 """""""""""""""""""""""""""""""""""""""""
 
 .. _table2:
@@ -314,11 +307,7 @@ Parameters for single threshold detection
 
 
 |
-|
 
-
-Parameters for double threshold detection   
-"""""""""""""""""""""""""""""""""""""""""
 
 .. _table3:
 
