@@ -5,10 +5,22 @@ API reference
 Signal preprocessing 
 --------------------
 
-.. autofunction:: use_mne.apply_filter
+.. automodule:: myonset.use_mne
+    
+    .. autofunction:: apply_filter
+    .. autofunction:: bipolar_ref
+    .. autofunction:: drop_channels
+    .. autofunction:: get_data_array
+    .. autofunction:: select_channels
 
 .. automodule:: use_mne
-    :members: apply_filter, bipolar_ref, drop_channels, get_data_array, select_channels
+    
+    .. autofunction:: apply_filter
+    .. autofunction:: bipolar_ref
+    .. autofunction:: drop_channels
+    .. autofunction:: get_data_array
+    .. autofunction:: select_channels
+
 
 .. automodule:: use_txt
     :members: apply_filter, bipolar_ref, drop_channels, load_txt_file, select_channels
