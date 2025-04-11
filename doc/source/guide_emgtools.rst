@@ -206,6 +206,8 @@ Below is some example code to call the ``get_onsets`` function, and a tables pre
 
 
 
+Optional ``get_onsets`` parameters   
+""""""""""""""""""""""""""""""""""
 .. _table1:
 
 .. table:: Table ``get_onsets`` optional parameters
@@ -242,6 +244,8 @@ Below is some example code to call the ``get_onsets`` function, and a tables pre
 
 
 
+Parameters for single threshold detection
+"""""""""""""""""""""""""""""""""""""""""
 
 .. _table2:
 
@@ -308,6 +312,8 @@ Below is some example code to call the ``get_onsets`` function, and a tables pre
 
 
 
+Parameters for double threshold detection   
+"""""""""""""""""""""""""""""""""""""""""
 
 .. _table3:
 
