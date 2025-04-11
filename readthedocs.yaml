@@ -12,6 +12,7 @@ build:
   jobs:
     install:
       - pip install sphinx-copybutton
+      - pip install myonset
 #    build:
 #      html:
 #        - mkdir -p $READTHEDOCS_OUTPUT/html/
