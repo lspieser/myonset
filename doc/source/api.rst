@@ -31,6 +31,13 @@ Signal processing and automatic detection
 -----------------------------------------
    
 .. automodule:: emgtools
+    .. autofunction:: detector_var
+	
+.. automodule:: myonset.emgtools
+    .. autofunction:: filtfilter
+	
+
+.. automodule:: myonset
     :members: detector_var, filtfilter, get_onset_ip, get_onset_somf, get_onsets, get_onsets_dbl_th, get_signal_max, get_signal_portions, global_var, hpfilter, integrated_profile, lpfilter, moving_avg, notch_filter, set_log_file, show_trial, signal_windows, somf, tkeo
 
 
