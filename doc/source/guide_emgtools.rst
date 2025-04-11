@@ -204,7 +204,8 @@ Below is some example code to call the ``get_onsets`` function, and a tables pre
                                             'th_tkeo':8, 'varying_min_tkeo':0},\
                                             use_raw=True, use_tkeo=True)
 
-
+|
+|
 
 Optional ``get_onsets`` parameters   
 """"""""""""""""""""""""""""""""""
@@ -243,6 +244,8 @@ Optional ``get_onsets`` parameters
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
 
 
+|
+|
 
 Parameters for single threshold detection
 """""""""""""""""""""""""""""""""""""""""
@@ -310,6 +313,8 @@ Parameters for single threshold detection
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
 
 
+|
+|
 
 
 Parameters for double threshold detection   
