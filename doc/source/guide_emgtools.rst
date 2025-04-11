@@ -163,7 +163,7 @@ The major drawback of this method is that only one onset and one offset can be d
 ----------------------------------------------------------------
 
 3.1. Pipeline of ``get_onsets`` function
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For optimal automatic detection of EMG activity onset and offset, we recommend to first individualize EMG burst periods using a threshold method, and second determine 
 each EMG onset and offset with integrated profile method. 
@@ -196,13 +196,13 @@ When ``method = 'double_threshold'``, detection is made using ``detector_dbl_th`
 :ref:`above<function_detector_dbl_th>`.
 In all cases, this first detection step can be applied either on raw EMG, on Teager-Kaiser EMG, or on both (active EMG is detected if either raw or Teager-Kaiser signal exceeds the threshold). 
 Detection parameters must be set separately for raw EMG and Teager-Kaiser EMG. 
-Below is some example code to call the ``get_onsets`` function, and a :ref:`table<table1>` presenting all possible optional parameters::
+Below is some example code to call the ``get_onsets`` function, and a tables presenting all possible optional parameters::
 
     onsets,offsets = myo.get_onsets(data_trial, times, sf=sf, 
                                     method='single_threshold',
-                                    use_raw=True, use_tkeo=True,
                                     params={'th_raw':3.5, 'varying_min_raw':1,\
-                                            'th_tkeo':8, 'varying_min_tkeo':0})
+                                            'th_tkeo':8, 'varying_min_tkeo':0},\
+                                            use_raw=True, use_tkeo=True)
 
 .. _table1:
 
@@ -216,8 +216,8 @@ Below is some example code to call the ``get_onsets`` function, and a :ref:`tabl
 	|                 | 'single_threshold' or                |                  |shold'      | depend on your data| 
 	|                 | 'double_threshold'                   |                  |            | of course          | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
-	| params          | Dictionnary with parameters specific |  See details below            | Sensitive to small |
-	|                 | to the detection method              |                               | EMG bursts         | 
+	| params          | Dictionnary with parameters specific |         See details for each method below          |
+	|                 | to the detection method              |  (:ref:`table<table2>` and :ref:`table<table3>`)   | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
 	| use_raw         | If True, apply detection on raw EMG  | True             | True       | Sensitive to small |
 	|                 |                                      |                  |            | EMG bursts         | 
@@ -236,6 +236,16 @@ Below is some example code to call the ``get_onsets`` function, and a :ref:`tabl
 	|                 | average of the integrated profile    | smoothing) to    |            |small EMG bursts    | 
 	|                 |                                      | .050             |            |                    | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
+
+
+.. _table2:
+
+.. table:: Table ``params`` dictionnary for single threshold detection
+
+	+-----------------+--------------------------------------+------------------+------------+--------------------+
+	| ``params`` Key  | Description                          | Recommended      | Default    | General effect /   |
+	|                 |                                      |   value          | value      |     Comment        |
+	+=================+======================================+==================+============+====================+
 	| th_raw          | Treshold value for raw EMG           |   3 to 7         |   3.5      | Increase to make   |
 	|                 |                                      |                  |            | detection less     | 
 	|                 |                                      |                  |            | sensitive          | 
@@ -289,42 +299,16 @@ Below is some example code to call the ``get_onsets`` function, and a :ref:`tabl
 	|                 | EMG signal                           |baseline variance | baseline   |adapts threshold to | 
 	|                 |                                      |                  | variance   |current background  | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
-	|sf               | EMG signal sampling frequency        |                  |   None     |If not provided, an |
-	|                 |                                      |                  |            |error occurs        | 
-	+-----------------+--------------------------------------+------------------+------------+--------------------+
-	|ip_search        | Maximum time window (in s) to search | [-.025,.025] to  |[-.050,.050]|Affect mainly       |
-	|                 | onset and offset around active EMG   | [-.075,.075]     |            |small EMG bursts    | 
-	|                 | period                               |                  |            |                    | 
-	+-----------------+--------------------------------------+------------------+------------+--------------------+
-	|moving_avg_window| Window width (in s) for moving       | 1/sf (no         |   .015     |Again, affect mainly|
-	|                 | average of the integrated profile    | smoothing) to    |            |small EMG bursts    | 
-	|                 |                                      | .050             |            |                    | 
-	+-----------------+--------------------------------------+------------------+------------+--------------------+
 
 
 
+.. _table3:
 
+.. table:: Table ``params`` dictionnary for double threshold detection
 
-3.2. Utilization of ``get_onsets_dbl_th`` function
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-For the ``get_onsets_dbl_th`` function, the first step of detection of active EMG windows is based on ``detector_dbl_th`` function, which uses a double threshold method 
-described :ref:`above<function_detector_dbl_th>`. Again, the first detection step can be applied either on raw EMG, on Teager-Kaiser EMG, or on both 
-(active EMG is detected if either raw or Teager-Kaiser signal exceeds the double threshold). Parameters of ``detector_dbl_th`` must be set separately for raw EMG and 
-Teager-Kaiser EMG. Below is some example code to call the ``get_onsets_dbl_th`` function, and a table presenting all possible optional parameters::
-
-    onsets,offsets = myo.get_onsets_dbl_th(data_trial, times, sf=sf, window_size=.020, min_above_threshold=.5 
-                                           use_raw=True, th_raw=3,
-                                           use_tkeo=True, th_tkeo=6)
-
-
-
-.. _table2:
-
-.. table:: Table ``get_onsets_dbl_th`` optional parameters
 
 	+-------------------+--------------------------------------+-----------------+------------+--------------------+
-	| Name              | Description                          | Recommended     | Default    | General effect /   |
+	| ``params`` Key    | Description                          | Recommended     | Default    | General effect /   |
 	|                   |                                      |   value         | value      |     Comment        |
 	+===================+======================================+=================+============+====================+
 	| window_size       | Size of the ahead window (in s) in   | .005 to .030    | .020       |Decrease to         |
@@ -334,9 +318,6 @@ Teager-Kaiser EMG. Below is some example code to call the ``get_onsets_dbl_th`` 
 	|min_above_threshold| Minimum amount of data points above  |   .35 to .65    |    .5      | Decrease to be     |
 	|                   | threshold in determined window to    |                 |            | more sensitive to  | 
 	|                   | detect active EMG                    |                 |            | short EMG bursts   | 
-	+-------------------+--------------------------------------+-----------------+------------+--------------------+
-	| use_raw           | If True, apply ``detector_dbl_th``   | True            | True       | Sensitive to small |
-	|                   | on raw EMG                           |                 |            | EMG bursts         | 
 	+-------------------+--------------------------------------+-----------------+------------+--------------------+
 	| th_raw            | Treshold value for raw EMG           |   2 to 6        |   3        | Increase to make   |
 	|                   |                                      |                 |            | detection less     | 
@@ -349,9 +330,6 @@ Teager-Kaiser EMG. Below is some example code to call the ``get_onsets_dbl_th`` 
 	|stbsl_raw          | Variance of rectified raw EMG signal |Global or trial's| Trial's    |Use trial's variance|
 	|                   |                                      |baseline variance| baseline   |adapts threshold to | 
 	|                   |                                      |                 | variance   |current background  | 
-	+-------------------+--------------------------------------+-----------------+------------+--------------------+
-	| use_tkeo          | If True, apply ``detector_dbl_th``   | True            | True       | Less sensitive to  |
-	|                   | on Teager-Kaiser EMG                 |                 |            | noisy EMG          | 
 	+-------------------+--------------------------------------+-----------------+------------+--------------------+
 	| th_tkeo           | Treshold value for Teager-Kaiser EMG |   8 to 12       |   8        | Increase to make   |
 	|                   |                                      |                 |            | detection less     | 
@@ -368,17 +346,6 @@ Teager-Kaiser EMG. Below is some example code to call the ``get_onsets_dbl_th`` 
 	|min_samples        | Required minimal number of samples   |    1 to 5       | 3          |Increase to reduce  |
 	|                   | above threshold (for both raw and    |                 |            |detection of small  | 
 	|                   | Teager-Kaiser EMG)                   |                 |            |EMG bursts          | 
-	+-------------------+--------------------------------------+-----------------+------------+--------------------+
-	|sf                 | EMG signal sampling frequency        |                 |   None     |If not provided, an |
-	|                   |                                      |                 |            |error occurs        | 
-	+-------------------+--------------------------------------+-----------------+------------+--------------------+
-	|ip_search          | Maximum time window (in s) to search | [-.025,.025] to |[-.050,.050]|Affect mainly       |
-	|                   | onset and offset around active EMG   | [-.075,.075]    |            |small EMG bursts    | 
-	|                   | period                               |                 |            |                    | 
-	+-------------------+--------------------------------------+-----------------+------------+--------------------+
-	|moving_avg_window  | Window width (in s) for moving       | 1/sf (no        |   .015     |Again, affect mainly|
-	|                   | average of the integrated profile    | smoothing) to   |            |small EMG bursts    | 
-	|                   |                                      | .050            |            |                    | 
 	+-------------------+--------------------------------------+-----------------+------------+--------------------+
 	
 
