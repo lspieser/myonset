@@ -204,6 +204,8 @@ Below is some example code to call the ``get_onsets`` function, and a tables pre
                                             'th_tkeo':8, 'varying_min_tkeo':0},\
                                             use_raw=True, use_tkeo=True)
 
+
+
 .. _table1:
 
 .. table:: Table ``get_onsets`` optional parameters
@@ -217,7 +219,8 @@ Below is some example code to call the ``get_onsets`` function, and a tables pre
 	|                 | 'double_threshold'                   |                  |            | of course          | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
 	| params          | Dictionnary with parameters specific |         See details for each method below          |
-	|                 | to the detection method              |  (:ref:`table<table2>` and :ref:`table<table3>`)   | 
+	|                 | to the detection method              | (single threshold :ref:`table<table2>` and double  | 
+	|                 | to the detection method              | threshold :ref:`table<table3>`)                    | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
 	| use_raw         | If True, apply detection on raw EMG  | True             | True       | Sensitive to small |
 	|                 |                                      |                  |            | EMG bursts         | 
@@ -236,6 +239,8 @@ Below is some example code to call the ``get_onsets`` function, and a tables pre
 	|                 | average of the integrated profile    | smoothing) to    |            |small EMG bursts    | 
 	|                 |                                      | .050             |            |                    | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
+
+
 
 
 .. _table2:
@@ -299,6 +304,8 @@ Below is some example code to call the ``get_onsets`` function, and a tables pre
 	|                 | EMG signal                           |baseline variance | baseline   |adapts threshold to | 
 	|                 |                                      |                  | variance   |current background  | 
 	+-----------------+--------------------------------------+------------------+------------+--------------------+
+
+
 
 
 
