@@ -32,7 +32,7 @@ release = '0.1'
 # ones.
 #extensions = [
 #]
-extensions = ['sphinx.ext.autodoc','sphinx.ext.napoleon','sphinx_copybutton',
+extensions = ['sphinx.ext.autodoc','sphinx.ext.napoleon','sphinx-copybutton',
 ]
 
 napoleon_google_docstring = False
